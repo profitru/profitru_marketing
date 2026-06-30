@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="description" content="Build a Flipkart profit picture that survives month-end: commission structures, fulfilment and shipping, cancellations, and GST. Close the gap between disbursements and real net margin.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://profitru.com/flipkart-profit-calculator/index.html">
+  <meta property="og:type" content="article">
+  <meta property="og:locale" content="en_IN">
+  <meta property="og:title" content="Flipkart profit calculator: fees, returns &amp; net margin | Profitru">
+  <meta property="og:description" content="Commission, fulfilment, cancellations, and GST&mdash;what belongs in a Flipkart India profit calculation.">
+  <meta property="og:url" content="https://profitru.com/flipkart-profit-calculator/index.html">
+  <meta property="og:site_name" content="Profitru">
+  <meta property="og:image" content="https://profitru.com/logos/profitru/profitru-logo-horizontal.png">
+  <meta property="og:image:width" content="900">
+  <meta property="og:image:height" content="400">
+  <meta property="og:image:alt" content="Profitru logo">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Flipkart profit calculator | Profitru">
+  <meta name="twitter:description" content="Flipkart India: fees, fulfilment, returns, and GST in one net margin view.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[
+    {"@type":"WebPage","@id":"https://profitru.com/flipkart-profit-calculator/index.html","name":"Flipkart profit calculator for Indian sellers","description":"Framework for Flipkart India net profit: commissions, fulfilment, cancellations, returns, and GST.","url":"https://profitru.com/flipkart-profit-calculator/index.html","isPartOf":{"@type":"WebSite","name":"Profitru","url":"https://profitru.com/"}},
+    {"@type":"BreadcrumbList","itemListElement":[
+      {"@type":"ListItem","position":1,"name":"Home","item":"https://profitru.com/"},
+      {"@type":"ListItem","position":2,"name":"Flipkart profit calculator","item":"https://profitru.com/flipkart-profit-calculator/index.html"}
+    ]}
+  ]}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Is my Flipkart disbursement enough to call it profit?","acceptedAnswer":{"@type":"Answer","text":"Disbursements help, but net margin still needs landed cost, allocated ads, cancellations, return damage, and GST treatment aligned with your books&mdash;often spread across more systems than the seller portal export."}},
+    {"@type":"Question","name":"How should I allocate Flipkart advertising to SKUs?","acceptedAnswer":{"@type":"Answer","text":"Blended account averages hide winners and losers. Where possible, map spend to listing or SKU cohorts and refresh when campaigns change; that is how you decide which products deserve inventory and discounting."}},
+    {"@type":"Question","name":"Is Flipkart GST handling the same as other marketplaces?","acceptedAnswer":{"@type":"Answer","text":"Concepts overlap, but invoice formats, credit notes, and timing can differ. Your model should follow how your CA reconciles marketplace documents with GSTR data&mdash;not only what a single channel shows."}},
+    {"@type":"Question","name":"Can Profitru sit next to Flipkart and my other channels?","acceptedAnswer":{"@type":"Answer","text":"Yes. Profitru is built for multi-channel Indian sellers: bring Flipkart together with other marketplaces and your own store so procurement and pricing use one margin definition."}}
+  ]}
+  </script>
+  <script>
+    (function () {
+      var key = "profitru-marketing-theme";
+      var stored = localStorage.getItem(key);
+      var theme =
+        stored === "light" || stored === "dark"
+          ? stored
+          : window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+      document.documentElement.setAttribute("data-theme", theme);
+      document.documentElement.style.colorScheme = theme === "dark" ? "dark" : "light";
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute("content", theme === "dark" ? "#0f172a" : "#2563eb");
+    })();
+  </script>
+  <title>Flipkart profit calculator: fees, returns &amp; net margin | Profitru</title>
+  <link rel="icon" type="image/png" href="../logos/profitru/profitru-favicon.png?v=profitru-direct-2026-04" sizes="any">
+  <link rel="apple-touch-icon" href="../logos/profitru/profitru-favicon.png?v=profitru-direct-2026-04">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Syne:wght@600;700;800&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet"></noscript>
+  <link rel="stylesheet" href="../styles.css?v=profitru-2026-04-13-perf">
+  <link rel="stylesheet" href="../nav-dropdown.css?v=2026-05-05-dark-nav">
+  <link rel="stylesheet" href="../policies.css?v=profitru-2026-04-13">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div class="data-nodes-bg" aria-hidden="true">
+    <svg class="data-nodes-bg__svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid slice" role="presentation" focusable="false">
+      <g class="data-nodes-bg__glow" aria-hidden="true">
+        <circle cx="480" cy="295" r="120" />
+        <circle cx="320" cy="480" r="90" />
+        <circle cx="780" cy="160" r="70" />
+      </g>
+      <path class="data-nodes-bg__lines" fill="none" d="M40,95 L200,65 L380,115 L560,72 L740,98 L920,88 M75,270 L280,245 L480,295 L680,258 L900,275 M55,455 L310,430 L550,470 L850,445 M210,625 L500,648 L780,608 M40,95 L75,270 M200,65 L280,245 M380,115 L480,295 M560,72 L680,258 M740,98 L900,275 M920,88 L900,275 M75,270 L55,455 M280,245 L310,430 M480,295 L550,470 M680,258 L850,445 M900,275 L850,445 M55,455 L210,625 M310,430 L500,648 M550,470 L780,608 M850,445 L780,608 M380,115 L280,245 M480,295 L310,430 M560,72 L480,295" />
+      <g class="data-nodes-bg__nodes">
+        <circle cx="40" cy="95" r="3.2" /><circle cx="200" cy="65" r="3.2" /><circle cx="380" cy="115" r="3.2" /><circle cx="560" cy="72" r="3.2" /><circle cx="740" cy="98" r="3.2" /><circle cx="920" cy="88" r="3.2" />
+        <circle cx="75" cy="270" r="3.2" /><circle cx="280" cy="245" r="3.2" /><circle cx="480" cy="295" r="4.2" /><circle cx="680" cy="258" r="3.2" /><circle cx="900" cy="275" r="3.2" />
+        <circle cx="55" cy="455" r="3.2" /><circle cx="310" cy="430" r="3.2" /><circle cx="550" cy="470" r="3.2" /><circle cx="850" cy="445" r="3.2" />
+        <circle cx="210" cy="625" r="3.2" /><circle cx="500" cy="648" r="4.2" /><circle cx="780" cy="608" r="3.2" />
+      </g>
+    </svg>
+  </div>
+
+  <header class="nav" data-nav>
+    <div class="nav-inner container--wide">
+      <a href="/index.html" class="logo logo--tile" aria-label="Profitru home">
+        <img src="../logos/profitru/profitru-logo-horizontal.png?v=profitru-direct-2026-04" width="900" height="400" alt="Profitru logo &mdash; Turn data into profit." class="logo-img" fetchpriority="high" decoding="async">
+      </a>
+      <div class="nav-end">
+        <nav class="nav-links nav-links--mega" id="nav-menu" aria-label="Primary">
+          <div class="nav-mega" data-nav-dropdown>
+            <button type="button" class="nav-mega__btn" id="nav-btn-product" aria-expanded="false" aria-controls="nav-panel-product" aria-haspopup="true">Product</button>
+            <div class="nav-mega__panel" id="nav-panel-product" role="region" aria-labelledby="nav-btn-product" hidden>
+              <div class="nav-mega__stack">
+                <a href="/#pains">Problem</a>
+                <a href="/#how">How it works</a>
+                <a href="/#features">What you get</a>
+                <a href="/#demo">See it in action</a>
+                <a href="/#faq">FAQ</a>
+                <a href="/#cta">Get started</a>
+                <a href="/#built-for">Why Profitru</a>
+              </div>
+            </div>
+          </div>
+          <div class="nav-mega" data-nav-dropdown>
+            <button type="button" class="nav-mega__btn" id="nav-btn-resources" aria-expanded="false" aria-controls="nav-panel-resources" aria-haspopup="true">Resources</button>
+            <div class="nav-mega__panel" id="nav-panel-resources" role="region" aria-labelledby="nav-btn-resources" hidden>
+              <div class="nav-mega__stack">
+                <a href="/#guides">Guides hub</a>
+                <a href="/blog/index.html">Blog</a>
+              </div>
+            </div>
+          </div>
+          <div class="nav-mega" data-nav-dropdown>
+            <button type="button" class="nav-mega__btn" id="nav-btn-company" aria-expanded="false" aria-controls="nav-panel-company" aria-haspopup="true">Company</button>
+            <div class="nav-mega__panel" id="nav-panel-company" role="region" aria-labelledby="nav-btn-company" hidden>
+              <div class="nav-mega__stack">
+                <a href="/contact.html">Contact</a>
+                <a href="/policies/index.html">Policies &amp; legal</a>
+              </div>
+            </div>
+          </div>
+          <a href="/waitlist.html" class="btn btn-primary nav-mega__cta">Join the waitlist</a>
+          <a href="https://bookings.cloud.microsoft/book/Proiftrudemo@profitru.com/" class="nav-mega__login" target="_blank" rel="noopener noreferrer">Book a demo</a>
+          <a href="https://profitru.app/login" class="nav-mega__login">Log in</a>
+        </nav>
+        <button type="button" class="theme-toggle" data-theme-toggle="1" aria-label="Switch theme">
+          <svg class="theme-toggle__moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
+          <svg class="theme-toggle__sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" /></svg>
+        </button>
+        <button type="button" class="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav-menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="policies-hub">
+    <div class="container">
+      <div class="policies-hub__intro">
+        <p class="eyebrow">Profit guides</p>
+        <h1>Flipkart profit calculator: what to include beyond the settlement sheet</h1>
+        <p>
+          A credible <strong>Flipkart profit calculator</strong> for India layers marketplace commission, shipping and fulfilment choices, cancellations and returns, marketing spend, and GST into one view. The portal&rsquo;s payout is a starting point&mdash;not the final word on SKU-level margin.
+        </p>
+      </div>
+
+      <div class="policy-page__inner">
+        <article class="policy-article">
+          <h2>Flipkart-specific cost drivers</h2>
+          <p>
+            Fee structures differ by vertical and fulfilment model. Whether you use Flipkart fulfilment or ship yourself changes not only logistics line items but also return paths and inventory exposure. Surface-level spreadsheets rarely capture intra-month policy shifts or promotional subsidies that move between gross and net columns.
+          </p>
+
+          <h2>Checklist for net margin</h2>
+          <ul>
+            <li><strong>Commission and fixed fees</strong> per category and price band.</li>
+            <li><strong>Shipping and reverse logistics</strong>: forward, RVP, and liquidation of unsellable returns.</li>
+            <li><strong>Cancellations and failed deliveries</strong> that still consume pick/pack and opportunity cost.</li>
+            <li><strong>Advertising and visibility</strong>: account-level spend allocated down to listings that actually consumed it.</li>
+            <li><strong>Working capital</strong>: payout cycles versus supplier and ad payment terms.</li>
+            <li><strong>GST alignment</strong> between marketplace invoices, credit notes, and your returns.</li>
+          </ul>
+
+          <h2>When Flipkart is only one leg of the stool</h2>
+          <p>
+            Many brands run Flipkart alongside Amazon, their own site, and retail. Margin discipline means the same definitions of COGS, return drag, and overhead allocation everywhere&mdash;otherwise you will over-invest in whichever channel has the friendliest short-term report.
+          </p>
+          <p>
+            Profitru is designed for that multi-channel reality: unify operational signals, returns, and procurement so your Flipkart numbers sit next to every other channel without manual reconciliation.
+          </p>
+
+          <div class="policy-callout">
+            <strong>See it on live data</strong>
+            <a href="/waitlist.html">Join the waitlist</a> and map Flipkart economics beside your other sales routes.
+          </div>
+        </article>
+
+        <nav class="seo-related" aria-labelledby="related-guides">
+          <h2 id="related-guides">Related profit guides</h2>
+          <div class="policies-grid" role="list">
+            <a class="policy-card" href="../amazon-profit-calculator/index.html" role="listitem">
+              <h2>Amazon profit calculator</h2>
+              <p>Fees, FBA, ads, and returns on Amazon India.</p>
+              <span class="policy-card__arrow">Read &rarr;</span>
+            </a>
+            <a class="policy-card" href="../ecommerce-profit-calculator/index.html" role="listitem">
+              <h2>Ecommerce profit calculator</h2>
+              <p>Own-store and D2C margin beyond marketplaces.</p>
+              <span class="policy-card__arrow">Read &rarr;</span>
+            </a>
+            <a class="policy-card" href="../multi-channel-profit-calculator/index.html" role="listitem">
+              <h2>Multi-channel profit calculator</h2>
+              <p>One consolidated net margin across channels.</p>
+              <span class="policy-card__arrow">Read &rarr;</span>
+            </a>
+          </div>
+        </nav>
+      </div>
+    </div>
+
+    <section class="section-faq seo-guide-faq" aria-labelledby="flipkart-faq-title">
+      <div class="container">
+        <header class="section-head">
+          <p class="section-kicker">FAQ</p>
+          <h2 id="flipkart-faq-title" class="section-title">Flipkart profit calculator</h2>
+          <p class="section-desc">Disbursements, ads, GST, and how Profitru fits your stack.</p>
+        </header>
+        <div class="faq-list">
+          <div class="faq-item">
+            <button type="button" class="faq-trigger" aria-expanded="false" aria-controls="fk-faq-a1" id="fk-faq-q1">
+              <span class="faq-trigger__label">Is my Flipkart disbursement enough to call it profit?</span>
+              <span class="chev" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-panel" id="fk-faq-a1" role="region" aria-labelledby="fk-faq-q1">
+              <div class="faq-panel-inner">
+                <p>Disbursements help, but net margin still needs landed cost, allocated ads, cancellations, return damage, and GST treatment aligned with your books&mdash;often spread across more systems than the seller portal export.</p>
+              </div>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button type="button" class="faq-trigger" aria-expanded="false" aria-controls="fk-faq-a2" id="fk-faq-q2">
+              <span class="faq-trigger__label">How should I allocate Flipkart advertising to SKUs?</span>
+              <span class="chev" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-panel" id="fk-faq-a2" role="region" aria-labelledby="fk-faq-q2">
+              <div class="faq-panel-inner">
+                <p>Blended account averages hide winners and losers. Where possible, map spend to listing or SKU cohorts and refresh when campaigns change; that is how you decide which products deserve inventory and discounting.</p>
+              </div>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button type="button" class="faq-trigger" aria-expanded="false" aria-controls="fk-faq-a3" id="fk-faq-q3">
+              <span class="faq-trigger__label">Is Flipkart GST handling the same as other marketplaces?</span>
+              <span class="chev" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-panel" id="fk-faq-a3" role="region" aria-labelledby="fk-faq-q3">
+              <div class="faq-panel-inner">
+                <p>Concepts overlap, but invoice formats, credit notes, and timing can differ. Your model should follow how your CA reconciles marketplace documents with GSTR data&mdash;not only what a single channel shows.</p>
+              </div>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button type="button" class="faq-trigger" aria-expanded="false" aria-controls="fk-faq-a4" id="fk-faq-q4">
+              <span class="faq-trigger__label">Can Profitru sit next to Flipkart and my other channels?</span>
+              <span class="chev" aria-hidden="true">+</span>
+            </button>
+            <div class="faq-panel" id="fk-faq-a4" role="region" aria-labelledby="fk-faq-q4">
+              <div class="faq-panel-inner">
+                <p>Yes. Profitru is built for multi-channel Indian sellers: bring Flipkart together with other marketplaces and your own store so procurement and pricing use one margin definition.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-cta contact-page-cta" aria-labelledby="seo-cta-flipkart">
+      <div class="container">
+        <h2 id="seo-cta-flipkart" class="cta-title">Tighten Flipkart margin with the full picture</h2>
+        <p class="cta-desc">Trial Profitru and connect Flipkart to the same profit logic you use everywhere else.</p>
+        <div class="cta-actions">
+          <a href="/waitlist.html" class="btn btn-primary btn-lg">Join the waitlist</a>
+          <a href="/index.html" class="btn btn-ghost btn-lg">Back to home</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="/index.html" class="logo logo--tile" aria-label="Profitru home">
+            <img src="../logos/profitru/profitru-logo-horizontal.png?v=profitru-direct-2026-04" width="900" height="400" alt="Profitru logo &mdash; Turn data into profit." class="logo-img" decoding="async">
+          </a>
+          <p>Operational clarity for Indian sellers who list on marketplaces, run their own store, or both.</p>
+        </div>
+        <div class="footer-col">
+          <h3>Product</h3>
+          <a href="/waitlist.html">Join waitlist</a>
+          <a href="https://profitru.app/login">Log in</a>
+          <a href="/#demo">Demo</a>
+        </div>
+        <div class="footer-col">
+          <h3>Guides</h3>
+          <a href="../blog/index.html">Blog</a>
+          <a href="../amazon-profit-calculator/index.html">Amazon profit</a>
+          <a href="../flipkart-profit-calculator/index.html">Flipkart profit</a>
+          <a href="../ecommerce-profit-calculator/index.html">Ecommerce profit</a>
+          <a href="../multi-channel-profit-calculator/index.html">Multi-channel profit</a>
+        </div>
+        <div class="footer-col">
+          <h3>Legal</h3>
+          <a href="../policies/index.html">Policies &amp; legal</a>
+          <a href="../policies/privacy-policy.html">Privacy</a>
+          <a href="../policies/terms-of-service.html">Terms</a>
+        </div>
+        <div class="footer-col">
+          <h3>Company</h3>
+          <a href="../contact.html">Contact</a>
+          <a href="/#faq">FAQ</a>
+        </div>
+        <div class="footer-col">
+          <h3>Social</h3>
+          <a href="https://www.instagram.com/profitru.app/" rel="noopener noreferrer" target="_blank">Instagram</a>
+          <a href="https://www.linkedin.com/in/profitru-app-0b4692402/index.html" rel="noopener noreferrer" target="_blank">LinkedIn</a>
+          <a href="https://x.com/profitruapps" rel="noopener noreferrer" target="_blank">X</a>
+          <a href="https://www.threads.net/@profitru.app" rel="noopener noreferrer" target="_blank">Threads</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; <span id="year"></span> Profitru. All rights reserved.</span>
+        <span>Marketing site &middot; App lives at profitru.app</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    window.addEventListener('load', function () {
+      function loadGa() {
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        window.gtag = gtag;
+        var s = document.createElement('script');
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=G-F02S0ECS1B';
+        s.async = true;
+        s.onload = function () {
+          gtag('js', new Date());
+          gtag('config', 'G-F02S0ECS1B');
+          gtag('config', 'AW-18287538280');
+        };
+        document.head.appendChild(s);
+      }
+      var ric = window.requestIdleCallback;
+      if (ric) ric(loadGa, { timeout: 3500 });
+      else setTimeout(loadGa, 1);
+    });
+  </script>
+<script src="../main.js?v=profitru-2026-04-13" defer></script>
+  <script src="../nav-dropdown.js?v=2026-04-25" defer></script>
+</body>
+</html>

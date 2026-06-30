@@ -1,0 +1,308 @@
+/* Mega nav: desktop flyouts, mobile stacked accordions. Loaded after styles.css. */
+
+/* Space between: dropdown group | CTA | Log in, and (via gap) the theme + menu controls */
+.nav-end {
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  column-gap: 1.5rem;
+}
+
+/* styles.css gives .theme-toggle { z-index: 110 } so the moon button stacks above
+   the .navLinks sibling. That can steal clicks on the right edge of the last items
+   (e.g. "Log in"). Keep theme above the mobile menu sheet only where needed. */
+@media (min-width: 1241px) {
+  .nav .nav-end > .nav-links {
+    position: relative;
+    z-index: 2;
+  }
+  .nav .nav-end .theme-toggle {
+    z-index: 0;
+  }
+}
+
+.nav-links--mega {
+  align-items: center;
+  /* row-gap / column-gap: breathing room between Product, Resources, Company, CTA, Log in */
+  gap: 0.5rem 1.75rem;
+  flex-wrap: nowrap;
+  overflow: visible;
+  isolation: isolate;
+}
+
+.nav-mega {
+  position: relative;
+  display: block;
+}
+
+.nav-mega__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.9rem;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-soft, #475569);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm, 10px);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+  white-space: nowrap;
+}
+.nav-mega__btn:hover,
+.nav-mega__btn:focus-visible {
+  color: var(--text, #0f172a);
+  background: var(--accent-dim, rgba(37, 99, 235, 0.12));
+  outline: none;
+}
+.nav-mega__btn[aria-expanded="true"] {
+  color: var(--accent-deep, #1d4ed8);
+  background: var(--accent-dim, rgba(37, 99, 235, 0.12));
+}
+
+html[data-theme="dark"] .nav-mega__btn {
+  color: #475569;
+}
+html[data-theme="dark"] .nav-mega__btn:hover,
+html[data-theme="dark"] .nav-mega__btn:focus-visible {
+  color: #0f172a;
+  background: rgba(37, 99, 235, 0.12);
+}
+html[data-theme="dark"] .nav-mega__btn[aria-expanded="true"] {
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.12);
+}
+
+/* Chevron */
+.nav-mega__btn::after {
+  content: "";
+  width: 0.45em;
+  height: 0.45em;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-0.1em);
+  opacity: 0.7;
+  transition: transform 0.2s var(--ease, ease);
+}
+.nav-mega__btn[aria-expanded="true"]::after {
+  transform: rotate(225deg) translateY(0.05em);
+}
+
+.nav-mega__panel {
+  list-style: none;
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  min-width: 220px;
+  max-width: min(100vw - 2rem, 300px);
+  background: var(--bg-elevated, #fff);
+  border: 1px solid var(--stroke, #e2e8f0);
+  border-radius: var(--radius, 16px);
+  box-shadow: var(--shadow-layer, 0 10px 40px rgba(15, 23, 42, 0.1));
+  z-index: 200;
+}
+
+html[data-theme="dark"] .nav-mega__panel {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+}
+
+.nav-mega__panel[hidden] {
+  display: none !important;
+}
+
+.nav-mega__stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.nav-mega__label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, #64748b);
+  padding: 0.4rem 0.5rem 0.25rem;
+  margin: 0;
+}
+
+.nav-mega__stack a {
+  display: block;
+  padding: 0.5rem 0.6rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text, #0f172a);
+  text-decoration: none;
+  border-radius: var(--radius-sm, 10px);
+  transition: background 0.12s ease;
+}
+html[data-theme="dark"] .nav .nav-mega__panel .nav-mega__stack a {
+  color: #f1f5f9;
+}
+.nav-mega__stack a:hover,
+.nav-mega__stack a:focus-visible {
+  background: var(--bg-deep, #f1f5f9);
+  outline: none;
+}
+html[data-theme="dark"] .nav-mega__stack a:hover,
+html[data-theme="dark"] .nav-mega__stack a:focus-visible {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.nav-mega__cta.btn {
+  margin-left: 0;
+  margin-right: 0;
+  white-space: nowrap;
+  font-size: 0.88rem;
+  padding: 0.5rem 1.1rem;
+}
+
+.nav-mega__login {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  min-height: 2.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text-muted, #64748b);
+  padding: 0.5rem 0.85rem;
+  text-decoration: none;
+  border-radius: var(--radius-sm, 10px);
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-mega__login:hover,
+.nav-mega__login:focus-visible {
+  color: var(--text, #0f172a);
+  background: var(--accent-dim, rgba(37, 99, 235, 0.08));
+  outline: none;
+}
+
+html[data-theme="dark"] .nav-mega__login {
+  color: #475569;
+}
+html[data-theme="dark"] .nav-mega__login:hover,
+html[data-theme="dark"] .nav-mega__login:focus-visible {
+  color: #0f172a;
+  background: rgba(37, 99, 235, 0.12);
+}
+
+/* --- Desktop: flyout under button --- */
+@media (min-width: 1241px) {
+  .nav-mega--open {
+    z-index: 201;
+  }
+
+  .nav-mega {
+    position: relative;
+  }
+
+  .nav-mega__panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.35rem;
+    padding: 0.5rem 0.65rem;
+  }
+
+  .nav-mega__panel::before {
+    content: "";
+    position: absolute;
+    top: -0.4rem;
+    left: 0;
+    right: 0;
+    height: 0.4rem;
+  }
+}
+
+/* --- Mobile / tablet: full-width stacked accordions in overlay --- */
+@media (max-width: 1240px) {
+  .nav-links--mega.open {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.75rem 0 0.25rem;
+    gap: 0;
+  }
+
+  .nav-mega {
+    width: 100%;
+    border-bottom: 1px solid var(--stroke, #e2e8f0);
+  }
+
+  html[data-theme="dark"] .nav-mega {
+    border-bottom-color: #e2e8f0;
+  }
+
+  .nav-mega__btn {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    padding: 0.85rem 0.5rem;
+    font-size: 1rem;
+    border-radius: 0;
+  }
+
+  .nav-mega__btn::after {
+    margin-right: 0.2rem;
+  }
+
+  .nav-mega__panel {
+    position: static;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    margin: 0 0 0.5rem;
+    border: 0;
+    box-shadow: none;
+    background: var(--bg-deep, #f1f5f9);
+    border-radius: var(--radius-sm, 10px);
+    padding: 0.35rem 0.5rem 0.65rem 1.25rem;
+  }
+
+  html[data-theme="dark"] .nav-mega__panel {
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .nav-mega__label {
+    padding-left: 0.5rem;
+  }
+
+  .nav-mega__stack a {
+    padding: 0.6rem 0.5rem;
+  }
+
+  .nav-mega__cta.btn {
+    margin: 0.6rem 0.5rem 0.75rem;
+    width: auto;
+    align-self: flex-start;
+    text-align: center;
+  }
+
+  .nav-mega__login {
+    display: block;
+    padding: 0.75rem 0.5rem 1rem;
+    margin: 0 0.5rem;
+    font-size: 1rem;
+    border-top: 1px solid var(--stroke, #e2e8f0);
+  }
+
+  html[data-theme="dark"] .nav-mega__login {
+    border-top-color: #e2e8f0;
+  }
+}
+
+/* Focus ring for keyboard users */
+.nav-mega__btn:focus-visible,
+.nav-mega__stack a:focus-visible,
+.nav-mega__login:focus-visible {
+  box-shadow: 0 0 0 2px var(--bg-base, #f8fafc), 0 0 0 4px var(--accent, #2563eb);
+}

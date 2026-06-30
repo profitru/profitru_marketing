@@ -1,0 +1,8 @@
+.venv-logo/
+.venv-fav/
+.venv/
+.env
+.env.example
+
+__pycache__/
+*.py[cod]

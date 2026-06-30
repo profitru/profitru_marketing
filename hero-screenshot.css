@@ -1,0 +1,17 @@
+/* Showcase frame: real product screenshot (hero reverted to animated preview card). */
+
+.showcase-frame__body--photo {
+  display: block;
+  padding: 0 !important;
+  background: var(--bg-deep) !important;
+}
+
+.showcase-frame__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}

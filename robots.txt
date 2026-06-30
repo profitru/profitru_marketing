@@ -1,0 +1,8 @@
+# https://www.robotstxt.org/robotstxt.html
+# Same file may be served on profitru.in and profitru.com; HTML uses
+# <link rel="canonical" href="https://profitru.com/..."> so search engines
+# prefer the .com URL. Prefer a 301 redirect from .in to .com at the CDN/host.
+User-agent: *
+Allow: /
+
+Sitemap: https://profitru.com/sitemap.xml
