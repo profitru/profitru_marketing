@@ -23,7 +23,7 @@ The static site is tuned for **Lighthouse / Core Web Vitals** without a bundler:
 - **`styles.css`** and **`policies.css`** are **minified** (clean-css); **`main.js`** is **minified** (terser). Editability: use git history or run a formatter locally if you need readable sources again.
 - **Homepage** loads **`styles.css` only** for above-the-fold CSS; the guides grid (`.policy-card`) lives in `styles.css` so the home path does not pay for an extra `policies.css` request.
 - **Google Fonts** load with **`preload` + `media="print"` / `onload`** (non-render-blocking) and a reduced **Syne** weight set (`600;700;800`).
-- **Google Analytics (gtag)** is loaded **at the end of `<body>`** (after content), not in `<head>`.
+- **Google Analytics (gtag)** uses measurement ID `G-FC5BTBW68G` in `<head>` on each page.
 - **Header logo** uses **`fetchpriority="high"`** on the homepage to help LCP.
 
 **On the server/CDN**, set **long cache TTL** for hashed or versioned assets (`?v=…`), **Brotli/Gzip**, and HTTP/2 or HTTP/3 so Lighthouse’s “efficient cache” and transfer-size audits improve.

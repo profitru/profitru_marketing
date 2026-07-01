@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC5BTBW68G"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-FC5BTBW68G');
+  </script>
+
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#2563eb">
@@ -265,27 +275,7 @@
       </div>
     </div>
   </footer>
-  <script>
-    window.addEventListener('load', function () {
-      function loadGa() {
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        window.gtag = gtag;
-        var s = document.createElement('script');
-        s.src = 'https://www.googletagmanager.com/gtag/js?id=G-F02S0ECS1B';
-        s.async = true;
-        s.onload = function () {
-          gtag('js', new Date());
-          gtag('config', 'G-F02S0ECS1B');
-          gtag('config', 'AW-18287538280');
-        };
-        document.head.appendChild(s);
-      }
-      var ric = window.requestIdleCallback;
-      if (ric) ric(loadGa, { timeout: 3500 });
-      else setTimeout(loadGa, 1);
-    });
-  </script>
+
   <script src="../../main.js?v=profitru-2026-04-13" defer></script>
   <script src="../../nav-dropdown.js?v=2026-04-25" defer></script>
 </body>
