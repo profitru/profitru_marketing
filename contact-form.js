@@ -58,7 +58,11 @@
       })
       .then(function (r) {
         if (r.ok && r.data && r.data.ok) {
-          setStatus("success", "Message sent. We will get back to you soon.");
+          var successMsg =
+            r.data.queued || r.data.email_sent === false
+              ? "Message received. We will get back to you soon."
+              : "Message sent. We will get back to you soon.";
+          setStatus("success", successMsg);
           form.reset();
         } else {
           var msg =

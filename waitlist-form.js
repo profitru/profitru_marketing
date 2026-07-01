@@ -60,10 +60,11 @@
       })
       .then(function (r) {
         if (r.ok && r.data && r.data.ok) {
-          setStatus(
-            "success",
-            "Thank you. We have received your details. Check your email for a short confirmation, and we will notify you when you are eligible for access."
-          );
+          var successMsg =
+            r.data.queued || r.data.email_sent === false
+              ? "Thank you. We have received your details and will review your request. We will email you when you are eligible for access."
+              : "Thank you. We have received your details. Check your email for a short confirmation, and we will notify you when you are eligible for access.";
+          setStatus("success", successMsg);
           form.reset();
         } else {
           var msg =

@@ -243,13 +243,13 @@ def api_contact():
                 },
             )
             log.warning("contact: saved fallback submission to %s", saved)
-            return jsonify({"ok": True, "queued": True})
+            return jsonify({"ok": True, "queued": True, "email_sent": False})
         except Exception:
             log.exception("contact: fallback save failed")
             return jsonify({"error": "Could not send your message. Please try email or try again later."}), 502
 
     log.info("contact: sent ok for %s subject=%r", email, subject[:80])
-    return jsonify({"ok": True})
+    return jsonify({"ok": True, "email_sent": True})
 
 
 @app.route("/api/waitlist", methods=["POST"])
@@ -325,7 +325,7 @@ def api_waitlist():
                 },
             )
             log.warning("waitlist: saved fallback submission to %s", saved)
-            return jsonify({"ok": True, "queued": True})
+            return jsonify({"ok": True, "queued": True, "email_sent": False})
         except Exception:
             log.exception("waitlist: fallback save failed")
             return (
@@ -338,7 +338,7 @@ def api_waitlist():
             )
 
     log.info("waitlist: sent ok for %s", email)
-    return jsonify({"ok": True})
+    return jsonify({"ok": True, "email_sent": True})
 
 
 @app.route("/api/health", methods=["GET"])
