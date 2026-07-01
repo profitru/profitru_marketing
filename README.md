@@ -166,7 +166,7 @@ If the marketing HTML is served from another host (CDN, S3), set the API base UR
 
 1. Upload the full static site to `/var/www/profitru-marketing` (not just `index.html`).
 2. Copy `.env` with valid `SMTP_*` values to the server.
-3. Install deps and run the API with gunicorn (see [deploy/profitru-contact-api.service](deploy/profitru-contact-api.service)).
+3. Install deps and run the API with gunicorn (see [deploy/profitru-marketing.service](deploy/profitru-marketing.service) — on the live server this unit is named `profitru-marketing.service`).
 4. Point nginx at the static root and proxy `/api/` to `127.0.0.1:8080` (see [deploy/nginx.profitru-marketing.conf](deploy/nginx.profitru-marketing.conf)).
 5. Check `GET /api/health` returns `{"ok": true, ...}`.
 
