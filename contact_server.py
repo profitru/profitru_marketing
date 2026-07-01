@@ -108,6 +108,20 @@ def _append_form_fallback(kind: str, payload: dict) -> Path:
     return out_path
 
 
+def _smtp_from_addr(default: str) -> str:
+    """Office 365 requires the SMTP From address to match the authenticated mailbox."""
+    smtp_user = os.environ.get("SMTP_USER", "").strip()
+    configured = os.environ.get("CONTACT_FROM_EMAIL", default).strip() or default
+    if smtp_user and configured.lower() != smtp_user.lower():
+        log.warning(
+            "CONTACT_FROM_EMAIL (%s) differs from SMTP_USER (%s); using SMTP_USER for SMTP From",
+            configured,
+            smtp_user,
+        )
+        return smtp_user
+    return configured or smtp_user or default
+
+
 def _send_contact_email(
     *,
     name: str,
@@ -117,7 +131,7 @@ def _send_contact_email(
     body: str,
 ) -> None:
     to_addr = os.environ.get("CONTACT_TO_EMAIL", "info@profitru.com").strip()
-    from_addr = os.environ.get("CONTACT_FROM_EMAIL", to_addr).strip()
+    from_addr = _smtp_from_addr(to_addr)
 
     text = (
         f"Name: {name}\n"
@@ -150,11 +164,9 @@ def _send_waitlist_emails(
 ) -> None:
     """Notify support; optional auto-ack to the user."""
     to_addr = os.environ.get("WAITLIST_TO_EMAIL", "support@profitru.com").strip()
-    from_addr = os.environ.get("CONTACT_FROM_EMAIL", to_addr).strip()
     if not to_addr:
         to_addr = "support@profitru.com"
-    if not from_addr:
-        from_addr = to_addr
+    from_addr = _smtp_from_addr(to_addr)
 
     internal = (
         f"New waitlist sign-up (marketing site)\n"
