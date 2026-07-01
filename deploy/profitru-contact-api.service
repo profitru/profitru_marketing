@@ -1,0 +1,16 @@
+[Unit]
+Description=Profitru marketing contact + waitlist API
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/profitru-marketing
+EnvironmentFile=/var/www/profitru-marketing/.env
+ExecStart=/var/www/profitru-marketing/.venv/bin/gunicorn -w 2 -b 127.0.0.1:8080 contact_server:app
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

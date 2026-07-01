@@ -44,7 +44,15 @@
       body: JSON.stringify(payload),
     })
       .then(function (res) {
-        return res.json().then(function (data) {
+        return res.text().then(function (text) {
+          var data = null;
+          if (text) {
+            try {
+              data = JSON.parse(text);
+            } catch (parseErr) {
+              data = null;
+            }
+          }
           return { ok: res.ok, status: res.status, data: data };
         });
       })

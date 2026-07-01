@@ -14,11 +14,13 @@ Open http://127.0.0.1:8080/contact.html or /waitlist.html
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import os
 import re
 import smtplib
 import ssl
+from datetime import datetime, timezone
 from email.message import EmailMessage
 from pathlib import Path
 from dotenv import load_dotenv
@@ -47,6 +49,13 @@ def _valid_phone(s: str) -> bool:
     return digits >= 8
 
 
+def _smtp_timeout() -> float:
+    try:
+        return float(os.environ.get("SMTP_TIMEOUT", "30"))
+    except ValueError:
+        return 30.0
+
+
 def _smtp_send_message(msg: EmailMessage) -> None:
     host = os.environ.get("SMTP_HOST", "").strip()
     if not host:
@@ -57,15 +66,16 @@ def _smtp_send_message(msg: EmailMessage) -> None:
     password = os.environ.get("SMTP_PASSWORD", "").strip()
     use_ssl = os.environ.get("SMTP_USE_SSL", "").lower() == "true" or port == 465
     use_tls = os.environ.get("SMTP_USE_TLS", "true").lower() == "true"
+    timeout = _smtp_timeout()
 
     if use_ssl:
         context = ssl.create_default_context()
-        with smtplib.SMTP_SSL(host, port, context=context) as smtp:
+        with smtplib.SMTP_SSL(host, port, context=context, timeout=timeout) as smtp:
             if user:
                 smtp.login(user, password)
             smtp.send_message(msg)
     else:
-        with smtplib.SMTP(host, port) as smtp:
+        with smtplib.SMTP(host, port, timeout=timeout) as smtp:
             smtp.ehlo()
             if use_tls:
                 context = ssl.create_default_context()
@@ -74,6 +84,28 @@ def _smtp_send_message(msg: EmailMessage) -> None:
             if user:
                 smtp.login(user, password)
             smtp.send_message(msg)
+
+
+def _fallback_dir() -> Path:
+    configured = os.environ.get("FORM_FALLBACK_DIR", "").strip()
+    if configured:
+        return Path(configured).expanduser()
+    return ROOT / "data" / "submissions"
+
+
+def _append_form_fallback(kind: str, payload: dict) -> Path:
+    """Persist a submission when SMTP is unavailable so nothing is lost."""
+    out_dir = _fallback_dir()
+    out_dir.mkdir(parents=True, exist_ok=True)
+    record = {
+        "kind": kind,
+        "received_at": datetime.now(timezone.utc).isoformat(),
+        **payload,
+    }
+    out_path = out_dir / f"{kind}.jsonl"
+    with out_path.open("a", encoding="utf-8") as fh:
+        fh.write(json.dumps(record, ensure_ascii=False) + "\n")
+    return out_path
 
 
 def _send_contact_email(
@@ -197,9 +229,24 @@ def api_contact():
         _send_contact_email(
             name=name, reply_email=email, phone=phone, subject=subject, body=message
         )
-    except Exception as e:
-        log.exception("SMTP send failed")
-        return jsonify({"error": "Could not send your message. Please try email or try again later."}), 502
+    except Exception:
+        log.exception("contact: SMTP send failed")
+        try:
+            saved = _append_form_fallback(
+                "contact",
+                {
+                    "name": name,
+                    "email": email,
+                    "phone": phone,
+                    "subject": subject,
+                    "message": message,
+                },
+            )
+            log.warning("contact: saved fallback submission to %s", saved)
+            return jsonify({"ok": True, "queued": True})
+        except Exception:
+            log.exception("contact: fallback save failed")
+            return jsonify({"error": "Could not send your message. Please try email or try again later."}), 502
 
     log.info("contact: sent ok for %s subject=%r", email, subject[:80])
     return jsonify({"ok": True})
@@ -264,17 +311,50 @@ def api_waitlist():
         )
     except Exception:
         log.exception("waitlist: SMTP send failed")
-        return (
-            jsonify(
+        try:
+            saved = _append_form_fallback(
+                "waitlist",
                 {
-                    "error": "Could not send your request. Please try again or email support@profitru.com directly.",
-                }
-            ),
-            502,
-        )
+                    "name": name,
+                    "email": email,
+                    "phone": phone,
+                    "company": company,
+                    "role": role,
+                    "marketplaces": marketplaces,
+                    "message": message,
+                },
+            )
+            log.warning("waitlist: saved fallback submission to %s", saved)
+            return jsonify({"ok": True, "queued": True})
+        except Exception:
+            log.exception("waitlist: fallback save failed")
+            return (
+                jsonify(
+                    {
+                        "error": "Could not send your request. Please try again or email support@profitru.com directly.",
+                    }
+                ),
+                502,
+            )
 
     log.info("waitlist: sent ok for %s", email)
     return jsonify({"ok": True})
+
+
+@app.route("/api/health", methods=["GET"])
+def api_health():
+    smtp_host = os.environ.get("SMTP_HOST", "").strip()
+    fallback = _fallback_dir()
+    return jsonify(
+        {
+            "ok": True,
+            "smtp_configured": bool(smtp_host),
+            "fallback_dir": str(fallback),
+            "fallback_writable": fallback.exists() and os.access(fallback, os.W_OK)
+            if fallback.exists()
+            else True,
+        }
+    )
 
 
 @app.route("/")

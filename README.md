@@ -161,3 +161,15 @@ gunicorn -w 2 -b 127.0.0.1:8080 contact_server:app
 ```
 
 If the marketing HTML is served from another host (CDN, S3), set the API base URL in [contact.html](contact.html) and [waitlist.html](waitlist.html) using the `<meta name="contact-api-base" content="https://your-api-host">` tag so `contact-form.js` and `waitlist-form.js` post to the correct origin.
+
+### Production deployment
+
+1. Upload the full static site to `/var/www/profitru-marketing` (not just `index.html`).
+2. Copy `.env` with valid `SMTP_*` values to the server.
+3. Install deps and run the API with gunicorn (see [deploy/profitru-contact-api.service](deploy/profitru-contact-api.service)).
+4. Point nginx at the static root and proxy `/api/` to `127.0.0.1:8080` (see [deploy/nginx.profitru-marketing.conf](deploy/nginx.profitru-marketing.conf)).
+5. Check `GET /api/health` returns `{"ok": true, ...}`.
+
+If SMTP is misconfigured, submissions are still saved under `data/submissions/*.jsonl` and the form returns success (`{"ok": true, "queued": true}`). Review those files and fix SMTP so email notifications resume.
+
+**Office 365 / Microsoft 365:** use `SMTP_HOST=smtp.office365.com`, port `587`, STARTTLS enabled. Basic auth must be allowed for the mailbox, or use an app password if MFA is on. A `535 Authentication unsuccessful` error means the password or auth policy needs updating in `.env`.

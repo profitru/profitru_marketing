@@ -26,7 +26,7 @@
       return;
     }
     if (submitBtn) submitBtn.disabled = true;
-    setStatus("pending", "Sending�");
+    setStatus("pending", "Sending\u2026");
 
     var fd = new FormData(form);
     var payload = {
@@ -46,7 +46,15 @@
       body: JSON.stringify(payload),
     })
       .then(function (res) {
-        return res.json().then(function (data) {
+        return res.text().then(function (text) {
+          var data = null;
+          if (text) {
+            try {
+              data = JSON.parse(text);
+            } catch (parseErr) {
+              data = null;
+            }
+          }
           return { ok: res.ok, status: res.status, data: data };
         });
       })
@@ -62,7 +70,9 @@
             (r.data && r.data.error) ||
             (r.status >= 500
               ? "Something went wrong. Please try again or email support@profitru.com."
-              : "Could not send. Check the form and try again.");
+              : r.status === 404
+                ? "The waitlist service is unavailable right now. Please email support@profitru.com directly."
+                : "Could not send. Check the form and try again.");
           setStatus("error", msg);
         }
       })
