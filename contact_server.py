@@ -130,7 +130,7 @@ def _send_contact_email(
     subject: str,
     body: str,
 ) -> None:
-    to_addr = os.environ.get("CONTACT_TO_EMAIL", "info@profitru.com").strip()
+    to_addr = os.environ.get("CONTACT_TO_EMAIL", "support@profitru.com").strip()
     from_addr = _smtp_from_addr(to_addr)
 
     text = (

@@ -128,7 +128,7 @@ Open `http://127.0.0.1:8080` (serves HTML with `charset=utf-8`).
 
 ## Contact form (email via SMTP)
 
-The [contact.html](contact.html) page includes a form that POSTs JSON to `/api/contact`. A small Flask app sends mail to **info@profitru.com** (configurable) using SMTP.
+The [contact.html](contact.html) page includes a form that POSTs JSON to `/api/contact`. A small Flask app sends mail to **support@profitru.com** (configurable) using SMTP.
 
 1. Copy the environment template and add your provider credentials:
 

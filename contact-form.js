@@ -76,7 +76,7 @@
       .catch(function () {
         setStatus(
           "error",
-          "Network error. Check your connection or email info@profitru.com directly."
+          "Network error. Check your connection or email support@profitru.com directly."
         );
       })
       .finally(function () {
