@@ -37,6 +37,9 @@
       message: (fd.get("message") || "").toString().trim(),
       company: (fd.get("company") || "").toString().trim(),
     };
+    if (window.ProfitruFormSecurity) {
+      Object.assign(payload, window.ProfitruFormSecurity.extraPayload());
+    }
 
     fetch(apiBase() + "/api/contact", {
       method: "POST",

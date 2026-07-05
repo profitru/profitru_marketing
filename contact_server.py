@@ -26,6 +26,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request, send_from_directory
 
+from form_security import client_ip, evaluate_submission, forms_enabled
+
 ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / ".env")
 
@@ -189,7 +191,7 @@ def _send_waitlist_emails(
     msg_in.set_content(internal)
     _smtp_send_message(msg_in)
 
-    send_ack = os.environ.get("WAITLIST_SEND_ACK", "true").lower() in ("1", "true", "yes")
+    send_ack = os.environ.get("WAITLIST_SEND_ACK", "false").lower() in ("1", "true", "yes")
     if not send_ack or not from_addr or not _valid_email(reply_email):
         return
 
@@ -207,6 +209,25 @@ def _send_waitlist_emails(
     msg_ack["To"] = reply_email
     msg_ack.set_content(ack_body)
     _smtp_send_message(msg_ack)
+
+
+def _submission_guard(kind: str, data: dict, *, email: str, subject: str = "", text_parts: tuple[str, ...] = ()):
+    ip = client_ip(dict(request.headers), request.remote_addr)
+    err, silent = evaluate_submission(
+        kind=kind,
+        ip=ip,
+        data=data,
+        email=email,
+        subject=subject,
+        text_parts=text_parts,
+    )
+    if silent:
+        log.info("%s: blocked submission from %s (spam/timing/honeypot)", kind, ip)
+        return jsonify({"ok": True})
+    if err:
+        status = 503 if not forms_enabled() else 429 if "Too many" in err else 400
+        return jsonify({"error": err}), status
+    return None
 
 
 @app.route("/api/contact", methods=["POST"])
@@ -236,6 +257,10 @@ def api_contact():
         return jsonify({"error": "Please enter a short subject or question line."}), 400
     if not message or len(message) > 10000:
         return jsonify({"error": "Please enter a message (up to about 10,000 characters)."}), 400
+
+    blocked = _submission_guard("contact", data, email=email, subject=subject, text_parts=(message, name))
+    if blocked is not None:
+        return blocked
 
     try:
         _send_contact_email(
@@ -311,6 +336,15 @@ def api_waitlist():
             400,
         )
 
+    blocked = _submission_guard(
+        "waitlist",
+        data,
+        email=email,
+        text_parts=(message, name, company, role, marketplaces),
+    )
+    if blocked is not None:
+        return blocked
+
     try:
         _send_waitlist_emails(
             name=name,
@@ -361,6 +395,8 @@ def api_health():
         {
             "ok": True,
             "smtp_configured": bool(smtp_host),
+            "forms_enabled": forms_enabled(),
+            "turnstile_required": bool(os.environ.get("TURNSTILE_SECRET_KEY", "").strip()),
             "fallback_dir": str(fallback),
             "fallback_writable": fallback.exists() and os.access(fallback, os.W_OK)
             if fallback.exists()

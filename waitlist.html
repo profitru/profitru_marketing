@@ -19,6 +19,7 @@
   <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
   <meta name="description" content="Join the Profitru waitlist for our private beta. Tell us about your business; we will notify you by email when you are eligible to access.">
   <meta name="contact-api-base" content="">
+  <meta name="turnstile-site-key" content="">
   <script>
     (function () {
       var key = "profitru-marketing-theme";
@@ -209,6 +210,7 @@
               <input id="waitlist-url-hp" name="url" type="text" tabindex="-1" autocomplete="off" value="">
             </div>
           </div>
+          <div id="waitlist-turnstile" style="margin-bottom: 12px;"></div>
           <div class="contact-form__actions">
             <button type="submit" class="btn btn-primary">Submit waitlist</button>
           </div>
@@ -295,6 +297,8 @@
 
   <script src="main.js?v=profitru-2026-04-13" defer></script>
     <script src="nav-dropdown.js?v=2026-04-25" defer></script>
-<script src="waitlist-form.js?v=profitru-2026-04" defer></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script src="form-security.js?v=profitru-form-security-2026-04" defer></script>
+<script src="waitlist-form.js?v=profitru-form-security-2026-04" defer></script>
 </body>
 </html>

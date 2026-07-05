@@ -19,6 +19,7 @@
   <meta name="description" content="Get in touch with Profitru &mdash; sales questions, product help, and security reporting.">
   <!-- Optional: set to your API origin if the form is hosted separately, e.g. https://api.profitru.com -->
   <meta name="contact-api-base" content="">
+  <meta name="turnstile-site-key" content="">
   <script>
     (function () {
       var key = "profitru-marketing-theme";
@@ -203,6 +204,7 @@
               <input id="contact-company" name="company" type="text" tabindex="-1" autocomplete="off">
             </div>
           </div>
+          <div id="contact-turnstile" style="margin-bottom: 12px;"></div>
           <div class="contact-form__actions">
             <button type="submit" class="btn btn-primary">Send message</button>
           </div>
@@ -300,6 +302,8 @@
 
 <script src="main.js?v=profitru-2026-04-13" defer></script>
     <script src="nav-dropdown.js?v=2026-04-25" defer></script>
-<script src="contact-form.js?v=profitru-contact-phone-2026-04" defer></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script src="form-security.js?v=profitru-form-security-2026-04" defer></script>
+<script src="contact-form.js?v=profitru-form-security-2026-04" defer></script>
 </body>
 </html>

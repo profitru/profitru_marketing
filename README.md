@@ -152,7 +152,19 @@ The [contact.html](contact.html) page includes a form that POSTs JSON to `/api/c
 
    Open `http://127.0.0.1:8080/contact.html` and submit the form. Submissions arrive with **Reply-To** set to the visitor’s address so you can reply from your inbox.
 
-**Waitlist** ([waitlist.html](waitlist.html)) POSTs to `/api/waitlist`. The server emails **support@profitru.com** (override with `WAITLIST_TO_EMAIL` in `.env`) and, by default, sends a short thank-you to the submitter (`WAITLIST_SEND_ACK=false` to disable the auto-reply only).
+**Waitlist** ([waitlist.html](waitlist.html)) POSTs to `/api/waitlist`. The server emails **support@profitru.com** (override with `WAITLIST_TO_EMAIL` in `.env`). Auto-reply to the submitter is **off by default** (`WAITLIST_SEND_ACK=true` only after SPF/DKIM pass).
+
+### Form spam protection
+
+Public forms are targeted by bots. The API now includes:
+
+- **Rate limiting** per IP (see `FORM_RATE_LIMIT_*` in `.env`)
+- **Minimum fill time** (blocks instant bot POSTs)
+- **Spam keyword / URL filtering** (silent reject — no email sent)
+- **Optional Cloudflare Turnstile** — set `TURNSTILE_SITE_KEY` in `.env` and `<meta name="turnstile-site-key" content="...">` in `contact.html` / `waitlist.html`
+- **Emergency stop** — `FORM_SUBMISSIONS_ENABLED=false` stops all outbound form mail
+
+If you see bounce floods from `Mail Delivery System`, disable `WAITLIST_SEND_ACK` and fix **SPF + DKIM** for `profitru.com` before re-enabling user acknowledgements.
 
 For production, put the site behind a reverse proxy and run the app with a WSGI server, for example:
 

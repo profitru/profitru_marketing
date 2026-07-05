@@ -39,6 +39,9 @@
       message: (fd.get("message") || "").toString().trim(),
       url: (fd.get("url") || "").toString().trim(),
     };
+    if (window.ProfitruFormSecurity) {
+      Object.assign(payload, window.ProfitruFormSecurity.extraPayload());
+    }
 
     fetch(apiBase() + "/api/waitlist", {
       method: "POST",
