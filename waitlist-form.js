@@ -28,6 +28,7 @@
     if (submitBtn) submitBtn.disabled = true;
     setStatus("pending", "Sending\u2026");
 
+    var submit = function () {
     var fd = new FormData(form);
     var payload = {
       name: (fd.get("name") || "").toString().trim(),
@@ -89,5 +90,14 @@
       .finally(function () {
         if (submitBtn) submitBtn.disabled = false;
       });
+    };
+
+    var ready = window.ProfitruFormSecurity
+      ? window.ProfitruFormSecurity.ensureReady()
+      : Promise.resolve();
+    ready.then(submit).catch(function (err) {
+      setStatus("error", err && err.message ? err.message : "Complete the security check and try again.");
+      if (submitBtn) submitBtn.disabled = false;
+    });
   });
 })();

@@ -161,7 +161,17 @@ Public forms are targeted by bots. The API now includes:
 - **Rate limiting** per IP (see `FORM_RATE_LIMIT_*` in `.env`)
 - **Minimum fill time** (blocks instant bot POSTs)
 - **Spam keyword / URL filtering** (silent reject — no email sent)
-- **Optional Cloudflare Turnstile** — set `TURNSTILE_SITE_KEY` in `.env` and `<meta name="turnstile-site-key" content="...">` in `contact.html` / `waitlist.html`
+- **Optional Cloudflare Turnstile** — required by default (`FORM_REQUIRE_TURNSTILE=true`). Set **both** keys in the **server** `.env` (not just the Cloudflare dashboard):
+
+  ```
+  TURNSTILE_SITE_KEY=0x4AAAAAAA...
+  TURNSTILE_SECRET_KEY=0x4AAAAAAA...
+  WAITLIST_SEND_ACK=false
+  ```
+
+  The site key is loaded from `GET /api/form-config` (static HTML on nginx does not embed it). Verify deploy: `GET /api/health` → `"turnstile_configured": true`.
+
+  Turnstile alone in Cloudflare is **not enough** until both keys are in `/home/profitru/profitru-marketing/.env` and `profitru-marketing` is restarted.
 - **Emergency stop** — `FORM_SUBMISSIONS_ENABLED=false` stops all outbound form mail
 
 If you see bounce floods from `Mail Delivery System`, disable `WAITLIST_SEND_ACK` and fix **SPF + DKIM** for `profitru.com` before re-enabling user acknowledgements.

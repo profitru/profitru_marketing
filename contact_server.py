@@ -26,7 +26,14 @@ from pathlib import Path
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request, send_from_directory
 
-from form_security import client_ip, evaluate_submission, forms_enabled
+from form_security import (
+    client_ip,
+    evaluate_submission,
+    forms_enabled,
+    turnstile_required,
+    turnstile_secret_configured,
+    turnstile_site_key,
+)
 
 ROOT = Path(__file__).resolve().parent
 load_dotenv(ROOT / ".env")
@@ -216,6 +223,7 @@ def _submission_guard(kind: str, data: dict, *, email: str, subject: str = "", t
     err, silent = evaluate_submission(
         kind=kind,
         ip=ip,
+        headers=dict(request.headers),
         data=data,
         email=email,
         subject=subject,
@@ -387,6 +395,17 @@ def api_waitlist():
     return jsonify({"ok": True, "email_sent": True})
 
 
+@app.route("/api/form-config", methods=["GET"])
+def api_form_config():
+    return jsonify(
+        {
+            "turnstile_site_key": turnstile_site_key(),
+            "turnstile_required": turnstile_required(),
+            "turnstile_configured": turnstile_secret_configured() and bool(turnstile_site_key()),
+        }
+    )
+
+
 @app.route("/api/health", methods=["GET"])
 def api_health():
     smtp_host = os.environ.get("SMTP_HOST", "").strip()
@@ -396,7 +415,8 @@ def api_health():
             "ok": True,
             "smtp_configured": bool(smtp_host),
             "forms_enabled": forms_enabled(),
-            "turnstile_required": bool(os.environ.get("TURNSTILE_SECRET_KEY", "").strip()),
+            "turnstile_required": turnstile_required(),
+            "turnstile_configured": turnstile_secret_configured() and bool(turnstile_site_key()),
             "fallback_dir": str(fallback),
             "fallback_writable": fallback.exists() and os.access(fallback, os.W_OK)
             if fallback.exists()

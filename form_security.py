@@ -1,8 +1,9 @@
-"""Rate limits, spam checks, and optional Turnstile verification for public forms."""
+"""Rate limits, spam checks, and Turnstile verification for public forms."""
 
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
 import threading
@@ -11,6 +12,8 @@ import urllib.parse
 import urllib.request
 from collections import defaultdict, deque
 from typing import Any
+
+log = logging.getLogger(__name__)
 
 _SPAM_SUBJECT_PATTERNS = (
     re.compile(r"powerball", re.I),
@@ -21,7 +24,9 @@ _SPAM_SUBJECT_PATTERNS = (
     re.compile(r"\bbitcoin\b.*\b(?:giveaway|airdrop)\b", re.I),
     re.compile(r"\b(?:make|earn)\s+money\s+fast\b", re.I),
     re.compile(r"\bseo\s+services?\b", re.I),
+    re.compile(r"\bjewel(?:l)?ery\b", re.I),
     re.compile(r"https?://", re.I),
+    re.compile(r"^[A-Z0-9\s!?]{20,}$"),  # shouty spam subjects
 )
 
 _SPAM_BODY_PATTERNS = (
@@ -30,6 +35,7 @@ _SPAM_BODY_PATTERNS = (
     re.compile(r"\bviagra\b", re.I),
     re.compile(r"\bclick here\b.*\bhttp", re.I),
     re.compile(r"\b(?:unsubscribe|opt.?out)\b.*http", re.I),
+    re.compile(r"\bjewel(?:l)?ery\b.*\binquir", re.I),
 )
 
 _DISPOSABLE_DOMAINS = frozenset(
@@ -42,7 +48,16 @@ _DISPOSABLE_DOMAINS = frozenset(
         "throwaway.email",
         "getnada.com",
         "sharklasers.com",
+        "temp-mail.org",
+        "guerrillamailblock.com",
     }
+)
+
+_ALLOWED_ORIGIN_SUFFIXES = (
+    "profitru.com",
+    "profitru.in",
+    "localhost",
+    "127.0.0.1",
 )
 
 _lock = threading.Lock()
@@ -63,8 +78,30 @@ def _env_float(name: str, default: float) -> float:
         return default
 
 
+def _env_bool(name: str, default: bool) -> bool:
+    raw = os.environ.get(name)
+    if raw is None or raw.strip() == "":
+        return default
+    return raw.strip().lower() in ("1", "true", "yes", "on")
+
+
 def forms_enabled() -> bool:
-    return os.environ.get("FORM_SUBMISSIONS_ENABLED", "true").lower() in ("1", "true", "yes")
+    return _env_bool("FORM_SUBMISSIONS_ENABLED", True)
+
+
+def turnstile_site_key() -> str:
+    return os.environ.get("TURNSTILE_SITE_KEY", "").strip()
+
+
+def turnstile_secret_configured() -> bool:
+    return bool(os.environ.get("TURNSTILE_SECRET_KEY", "").strip())
+
+
+def turnstile_required() -> bool:
+    """Require a valid Turnstile token before sending mail (default: true)."""
+    if not _env_bool("FORM_REQUIRE_TURNSTILE", True):
+        return False
+    return turnstile_secret_configured()
 
 
 def client_ip(headers: dict[str, str], remote_addr: str | None) -> str:
@@ -74,10 +111,19 @@ def client_ip(headers: dict[str, str], remote_addr: str | None) -> str:
     return (remote_addr or "unknown").strip() or "unknown"
 
 
+def origin_allowed(headers: dict[str, str]) -> bool:
+    if not _env_bool("FORM_REQUIRE_ALLOWED_ORIGIN", True):
+        return True
+    origin = (headers.get("Origin") or headers.get("Referer") or "").strip().lower()
+    if not origin:
+        return False
+    return any(suffix in origin for suffix in _ALLOWED_ORIGIN_SUFFIXES)
+
+
 def rate_limit_exceeded(kind: str, ip: str) -> bool:
     window = _env_int("FORM_RATE_LIMIT_WINDOW_SEC", 3600)
-    max_hits = _env_int("FORM_RATE_LIMIT_MAX_CONTACT", 5) if kind == "contact" else _env_int(
-        "FORM_RATE_LIMIT_MAX_WAITLIST", 3
+    max_hits = _env_int("FORM_RATE_LIMIT_MAX_CONTACT", 2) if kind == "contact" else _env_int(
+        "FORM_RATE_LIMIT_MAX_WAITLIST", 2
     )
     now = time.time()
     key = f"{kind}:{ip}"
@@ -98,7 +144,7 @@ def _looks_spam(*parts: str) -> bool:
             return True
     body = " ".join(parts[1:])
     url_count = len(re.findall(r"https?://", body, flags=re.I))
-    if url_count > 2:
+    if url_count > 1:
         return True
     for pattern in _SPAM_BODY_PATTERNS:
         if pattern.search(body):
@@ -121,7 +167,7 @@ def form_timing_ok(data: dict[str, Any]) -> bool:
         return False
     now_ms = int(time.time() * 1000)
     elapsed = (now_ms - started_ms) / 1000.0
-    min_sec = _env_float("FORM_MIN_FILL_SECONDS", 3.0)
+    min_sec = _env_float("FORM_MIN_FILL_SECONDS", 5.0)
     max_sec = _env_float("FORM_MAX_FILL_SECONDS", 7200.0)
     return min_sec <= elapsed <= max_sec
 
@@ -129,7 +175,7 @@ def form_timing_ok(data: dict[str, Any]) -> bool:
 def verify_turnstile(token: str, remote_ip: str | None) -> bool:
     secret = os.environ.get("TURNSTILE_SECRET_KEY", "").strip()
     if not secret:
-        return True
+        return False
     if not (token or "").strip():
         return False
     payload = urllib.parse.urlencode(
@@ -148,19 +194,19 @@ def verify_turnstile(token: str, remote_ip: str | None) -> bool:
     try:
         with urllib.request.urlopen(req, timeout=10) as resp:
             body = json.loads(resp.read().decode())
-    except Exception:
+    except Exception as exc:
+        log.warning("turnstile verify request failed: %s", exc)
         return False
+    if not body.get("success"):
+        log.info("turnstile verify rejected: %s", body.get("error-codes"))
     return body.get("success") is True
-
-
-def turnstile_required() -> bool:
-    return bool(os.environ.get("TURNSTILE_SECRET_KEY", "").strip())
 
 
 def evaluate_submission(
     *,
     kind: str,
     ip: str,
+    headers: dict[str, str],
     data: dict[str, Any],
     email: str,
     subject: str = "",
@@ -173,14 +219,23 @@ def evaluate_submission(
     if not forms_enabled():
         return ("Form submissions are temporarily unavailable. Please email support@profitru.com.", False)
 
+    if turnstile_required() and not turnstile_secret_configured():
+        log.error("FORM_REQUIRE_TURNSTILE is on but TURNSTILE_SECRET_KEY is missing")
+        return ("Form is temporarily unavailable. Please email support@profitru.com.", False)
+
+    if not origin_allowed(headers):
+        return (None, True)
+
     if rate_limit_exceeded(kind, ip):
         return ("Too many submissions from your network. Please try again later.", False)
 
     if not form_timing_ok(data):
         return (None, True)
 
-    if turnstile_required() and not verify_turnstile(str(data.get("turnstile_token") or ""), ip):
-        return ("Security check failed. Please refresh the page and try again.", False)
+    if turnstile_required():
+        token = str(data.get("turnstile_token") or "").strip()
+        if not verify_turnstile(token, ip):
+            return (None, True)
 
     if disposable_email(email):
         return (None, True)
