@@ -6,9 +6,14 @@
   var submitBtn = form.querySelector('[type="submit"]');
 
   function apiBase() {
+    if (window.ProfitruFormSecurity && window.ProfitruFormSecurity.apiBase) {
+      return window.ProfitruFormSecurity.apiBase();
+    }
     var meta = document.querySelector('meta[name="contact-api-base"]');
     var v = meta && meta.getAttribute("content");
-    return (v || "").replace(/\/$/, "");
+    v = (v || "").trim().replace(/\/$/, "");
+    if (v) return v;
+    return window.location && window.location.origin ? window.location.origin : "";
   }
 
   function setStatus(kind, text) {
@@ -68,6 +73,10 @@
               : "Message sent. We will get back to you soon.";
           setStatus("success", successMsg);
           form.reset();
+          if (window.ProfitruFormSecurity) {
+            window.ProfitruFormSecurity.formStartedAt = Date.now();
+            window.ProfitruFormSecurity.resetTurnstile();
+          }
         } else {
           var msg =
             (r.data && r.data.error) ||

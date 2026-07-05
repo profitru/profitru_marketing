@@ -6,7 +6,12 @@
   function apiBase() {
     var meta = document.querySelector('meta[name="contact-api-base"]');
     var v = meta && meta.getAttribute("content");
-    return (v || "").replace(/\/$/, "");
+    v = (v || "").trim().replace(/\/$/, "");
+    if (v) return v;
+    if (window.location && window.location.origin && window.location.origin !== "null") {
+      return window.location.origin;
+    }
+    return "";
   }
 
   function turnstileSiteKey() {
@@ -15,17 +20,55 @@
     return meta && meta.getAttribute("content") ? meta.getAttribute("content").trim() : "";
   }
 
+  function setSubmitEnabled(enabled) {
+    document
+      .querySelectorAll("#contact-form [type=submit], #waitlist-form [type=submit]")
+      .forEach(function (btn) {
+        btn.disabled = !enabled;
+      });
+  }
+
+  function waitForTurnstile(maxMs) {
+    return new Promise(function (resolve, reject) {
+      if (window.turnstile) {
+        resolve();
+        return;
+      }
+      var start = Date.now();
+      var timer = setInterval(function () {
+        if (window.turnstile) {
+          clearInterval(timer);
+          resolve();
+        } else if (Date.now() - start > maxMs) {
+          clearInterval(timer);
+          reject(new Error("Human verification failed to load. Refresh the page and try again."));
+        }
+      }, 50);
+    });
+  }
+
+  function onTurnstileReady() {
+    document.dispatchEvent(new CustomEvent("profitru-turnstile-ready"));
+    setSubmitEnabled(true);
+  }
+
+  function onTurnstileInvalid() {
+    setSubmitEnabled(false);
+  }
+
   function mountTurnstile(containerId) {
     var key = turnstileSiteKey();
     var container = document.getElementById(containerId);
-    if (!key || !container || !window.turnstile || widgets[containerId]) return;
+    if (!key || !container || !window.turnstile || widgets[containerId]) return false;
     widgets[containerId] = window.turnstile.render(container, {
       sitekey: key,
       theme: "auto",
-      callback: function () {
-        document.dispatchEvent(new CustomEvent("profitru-turnstile-ready"));
-      },
+      appearance: "always",
+      callback: onTurnstileReady,
+      "expired-callback": onTurnstileInvalid,
+      "error-callback": onTurnstileInvalid,
     });
+    return true;
   }
 
   function loadConfig() {
@@ -45,8 +88,37 @@
       });
   }
 
+  function initTurnstileWidgets() {
+    if (!turnstileSiteKey()) return Promise.resolve();
+    var hasWidget =
+      !!document.getElementById("contact-turnstile") ||
+      !!document.getElementById("waitlist-turnstile");
+    if (!hasWidget) return Promise.resolve();
+    setSubmitEnabled(false);
+    return waitForTurnstile(15000)
+      .then(function () {
+        mountTurnstile("contact-turnstile");
+        mountTurnstile("waitlist-turnstile");
+        if (window.ProfitruFormSecurity.turnstileToken()) {
+          setSubmitEnabled(true);
+        }
+      })
+      .catch(function (err) {
+        var statusEl =
+          document.getElementById("contact-form-status") ||
+          document.getElementById("waitlist-form-status");
+        if (statusEl) {
+          statusEl.hidden = false;
+          statusEl.textContent = err && err.message ? err.message : "Human verification failed to load.";
+          statusEl.className = "contact-form-status contact-form-status--error";
+        }
+        setSubmitEnabled(false);
+      });
+  }
+
   window.ProfitruFormSecurity = {
     formStartedAt: Date.now(),
+    apiBase: apiBase,
     turnstileSiteKey: turnstileSiteKey,
     isTurnstileRequired: function () {
       return turnstileRequired || !!turnstileSiteKey();
@@ -67,24 +139,30 @@
       if (window.ProfitruFormSecurity.turnstileToken()) return Promise.resolve();
       return new Promise(function (resolve, reject) {
         var timer = setTimeout(function () {
-          reject(new Error("Security check timed out. Refresh and try again."));
+          reject(new Error("Complete the human verification check before submitting."));
         }, 15000);
         function done() {
           clearTimeout(timer);
           if (window.ProfitruFormSecurity.turnstileToken()) resolve();
-          else reject(new Error("Complete the security check before submitting."));
+          else reject(new Error("Complete the human verification check before submitting."));
         }
         document.addEventListener("profitru-turnstile-ready", done, { once: true });
       });
     },
+    resetTurnstile: function () {
+      if (widgets["contact-turnstile"] && window.turnstile) {
+        window.turnstile.reset(widgets["contact-turnstile"]);
+      }
+      if (widgets["waitlist-turnstile"] && window.turnstile) {
+        window.turnstile.reset(widgets["waitlist-turnstile"]);
+      }
+      if (window.ProfitruFormSecurity.isTurnstileRequired()) {
+        setSubmitEnabled(false);
+      }
+    },
   };
 
   document.addEventListener("DOMContentLoaded", function () {
-    loadConfig().finally(function () {
-      if (turnstileSiteKey()) {
-        mountTurnstile("contact-turnstile");
-        mountTurnstile("waitlist-turnstile");
-      }
-    });
+    loadConfig().finally(initTurnstileWidgets);
   });
 })();

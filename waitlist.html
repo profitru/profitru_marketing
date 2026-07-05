@@ -210,7 +210,11 @@
               <input id="waitlist-url-hp" name="url" type="text" tabindex="-1" autocomplete="off" value="">
             </div>
           </div>
-          <div id="waitlist-turnstile" style="margin-bottom: 12px;"></div>
+          <fieldset class="contact-form__verification" aria-labelledby="waitlist-verification-label">
+            <legend id="waitlist-verification-label" class="contact-form__label">Human verification <span class="contact-form__req" aria-hidden="true">*</span></legend>
+            <p class="contact-form__hint">Complete the check below so we know you are a real person.</p>
+            <div id="waitlist-turnstile" class="contact-form__turnstile"></div>
+          </fieldset>
           <div class="contact-form__actions">
             <button type="submit" class="btn btn-primary">Submit waitlist</button>
           </div>
@@ -298,7 +302,7 @@
   <script src="main.js?v=profitru-2026-04-13" defer></script>
     <script src="nav-dropdown.js?v=2026-04-25" defer></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script src="form-security.js?v=profitru-turnstile-enforce-2026-04" defer></script>
-<script src="waitlist-form.js?v=profitru-turnstile-enforce-2026-04" defer></script>
+<script src="form-security.js?v=profitru-captcha-2026-07" defer></script>
+<script src="waitlist-form.js?v=profitru-captcha-2026-07" defer></script>
 </body>
 </html>
