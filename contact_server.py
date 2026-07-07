@@ -133,6 +133,30 @@ def _smtp_from_addr(default: str) -> str:
     return configured or smtp_user or default
 
 
+def _inbox_for_kind(kind: str) -> str:
+    """Destination inbox for form notifications. Avoid defaulting to the SMTP sender mailbox."""
+    if kind == "waitlist":
+        explicit = os.environ.get("WAITLIST_TO_EMAIL", "").strip()
+        if explicit:
+            return explicit
+        shared = os.environ.get("CONTACT_TO_EMAIL", "").strip()
+        if shared:
+            return shared
+        return "founder@profitru.com"
+    return os.environ.get("CONTACT_TO_EMAIL", "founder@profitru.com").strip() or "founder@profitru.com"
+
+
+def _warn_same_mailbox_loop(kind: str, from_addr: str, to_addr: str) -> None:
+    if from_addr.lower() == to_addr.lower():
+        log.warning(
+            "%s: notification To and SMTP From are both %s; Microsoft may reject this after spam events. "
+            "Set %s to a different inbox you monitor (e.g. founder@profitru.com).",
+            kind,
+            from_addr,
+            "WAITLIST_TO_EMAIL" if kind == "waitlist" else "CONTACT_TO_EMAIL",
+        )
+
+
 def _send_contact_email(
     *,
     name: str,
@@ -141,8 +165,9 @@ def _send_contact_email(
     subject: str,
     body: str,
 ) -> None:
-    to_addr = os.environ.get("CONTACT_TO_EMAIL", "support@profitru.com").strip()
+    to_addr = _inbox_for_kind("contact")
     from_addr = _smtp_from_addr(to_addr)
+    _warn_same_mailbox_loop("contact", from_addr, to_addr)
 
     text = (
         f"Name: {name}\n"
@@ -174,10 +199,9 @@ def _send_waitlist_emails(
     message: str,
 ) -> None:
     """Notify support; optional auto-ack to the user."""
-    to_addr = os.environ.get("WAITLIST_TO_EMAIL", "support@profitru.com").strip()
-    if not to_addr:
-        to_addr = "support@profitru.com"
+    to_addr = _inbox_for_kind("waitlist")
     from_addr = _smtp_from_addr(to_addr)
+    _warn_same_mailbox_loop("waitlist", from_addr, to_addr)
 
     internal = (
         f"New waitlist sign-up (marketing site)\n"

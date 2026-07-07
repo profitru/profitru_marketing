@@ -152,7 +152,7 @@ The [contact.html](contact.html) page includes a form that POSTs JSON to `/api/c
 
    Open `http://127.0.0.1:8080/contact.html` and submit the form. Submissions arrive with **Reply-To** set to the visitor’s address so you can reply from your inbox.
 
-**Waitlist** ([waitlist.html](waitlist.html)) POSTs to `/api/waitlist`. The server emails **support@profitru.com** (override with `WAITLIST_TO_EMAIL` in `.env`). Auto-reply to the submitter is **off by default** (`WAITLIST_SEND_ACK=true` only after SPF/DKIM pass).
+**Waitlist** ([waitlist.html](waitlist.html)) POSTs to `/api/waitlist`. Notifications go to `WAITLIST_TO_EMAIL` (defaults to `CONTACT_TO_EMAIL`, then `founder@profitru.com`). **Do not** deliver to the same mailbox as `SMTP_USER` after a spam event — Microsoft often blocks `support@` → `support@` loops. Auto-reply to the submitter is **off by default** (`WAITLIST_SEND_ACK=true` only after SPF/DKIM pass).
 
 ### Form spam protection
 
@@ -195,3 +195,13 @@ If the marketing HTML is served from another host (CDN, S3), set the API base UR
 If SMTP is misconfigured, submissions are still saved under `data/submissions/*.jsonl` and the form returns success (`{"ok": true, "queued": true}`). Review those files and fix SMTP so email notifications resume.
 
 **Office 365 / Microsoft 365:** use `SMTP_HOST=smtp.office365.com`, port `587`, STARTTLS enabled. Basic auth must be allowed for the mailbox, or use an app password if MFA is on. A `535 Authentication unsuccessful` error means the password or auth policy needs updating in `.env`.
+
+If Outlook shows *“sending email address was not recognized as a valid sender”* for `[Profitru waitlist]` messages, `support@profitru.com` was likely restricted after bot spam. Fix:
+
+1. Set `CONTACT_TO_EMAIL=founder@profitru.com` and `WAITLIST_TO_EMAIL=founder@profitru.com` in the **server** `.env` (keep `SMTP_USER=support@profitru.com` if that is your authenticated sender).
+2. In Microsoft 365 admin: **Email & collaboration → Review → Restricted users** — unblock `support@profitru.com` if listed.
+3. Ensure **SPF**, **DKIM**, and **DMARC** are valid for `profitru.com`.
+4. Keep `WAITLIST_SEND_ACK=false` until reputation recovers.
+5. Restart: `sudo systemctl restart profitru-marketing`.
+
+Missed submissions may still be in `data/submissions/waitlist.jsonl` on the server when SMTP failed or mail bounced.
