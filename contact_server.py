@@ -157,6 +157,21 @@ def _warn_same_mailbox_loop(kind: str, from_addr: str, to_addr: str) -> None:
         )
 
 
+def _email_routing_info() -> dict[str, object]:
+    contact_to = _inbox_for_kind("contact")
+    waitlist_to = _inbox_for_kind("waitlist")
+    from_addr = _smtp_from_addr(contact_to)
+    send_ack = os.environ.get("WAITLIST_SEND_ACK", "false").lower() in ("1", "true", "yes")
+    return {
+        "smtp_user": os.environ.get("SMTP_USER", "").strip(),
+        "smtp_from": from_addr,
+        "contact_to_email": contact_to,
+        "waitlist_to_email": waitlist_to,
+        "waitlist_send_ack": send_ack,
+        "same_mailbox_loop": from_addr.lower() in {contact_to.lower(), waitlist_to.lower()},
+    }
+
+
 def _send_contact_email(
     *,
     name: str,
@@ -222,6 +237,7 @@ def _send_waitlist_emails(
     msg_in["To"] = to_addr
     msg_in["Reply-To"] = reply_email
     msg_in.set_content(internal)
+    log.info("waitlist: sending notification to %s from %s for %s", to_addr, from_addr, reply_email)
     _smtp_send_message(msg_in)
 
     send_ack = os.environ.get("WAITLIST_SEND_ACK", "false").lower() in ("1", "true", "yes")
@@ -428,6 +444,7 @@ def api_form_config():
         "turnstile_required": turnstile_required(),
         "turnstile_configured": turnstile_secret_configured() and bool(turnstile_site_key()),
         "form_nonce_required": form_nonce_required(),
+        "waitlist_send_ack": _email_routing_info()["waitlist_send_ack"],
     }
     if form_nonce_required():
         payload["form_nonce"] = issue_form_nonce()
@@ -450,6 +467,7 @@ def api_health():
             "fallback_writable": fallback.exists() and os.access(fallback, os.W_OK)
             if fallback.exists()
             else True,
+            **_email_routing_info(),
         }
     )
 

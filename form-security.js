@@ -2,6 +2,7 @@
   var configuredSiteKey = "";
   var turnstileRequired = false;
   var formNonce = "";
+  var waitlistSendAck = false;
   var widgets = {};
 
   function apiBase() {
@@ -85,6 +86,7 @@
     if (cfg.turnstile_site_key) configuredSiteKey = cfg.turnstile_site_key.trim();
     turnstileRequired = !!cfg.turnstile_required;
     if (cfg.form_nonce) formNonce = cfg.form_nonce;
+    waitlistSendAck = !!cfg.waitlist_send_ack;
   }
 
   function loadConfig() {
@@ -154,6 +156,9 @@
       return loadConfig().then(function () {
         window.ProfitruFormSecurity.resetTurnstile();
       });
+    },
+    waitlistSendAckEnabled: function () {
+      return waitlistSendAck;
     },
     ensureReady: function () {
       if (!formNonce) {
