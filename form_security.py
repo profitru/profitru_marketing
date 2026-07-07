@@ -141,11 +141,23 @@ def _env_float(name: str, default: float) -> float:
         return default
 
 
-def _env_bool(name: str, default: bool) -> bool:
+def _normalize_env_value(raw: str) -> str:
+    """Strip whitespace, optional quotes, and systemd-unfriendly inline # comments."""
+    value = raw.strip()
+    if "#" in value:
+        value = value.split("#", 1)[0].strip()
+    return value.strip('"').strip("'")
+
+
+def env_bool(name: str, default: bool = False) -> bool:
     raw = os.environ.get(name)
     if raw is None or raw.strip() == "":
         return default
-    return raw.strip().lower() in ("1", "true", "yes", "on")
+    return _normalize_env_value(raw).lower() in ("1", "true", "yes", "on")
+
+
+def _env_bool(name: str, default: bool) -> bool:
+    return env_bool(name, default)
 
 
 def forms_enabled() -> bool:

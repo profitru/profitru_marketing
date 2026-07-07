@@ -160,6 +160,11 @@ def test_form_nonce_rejects_invalid(monkeypatch):
     assert err is None and silent is True
 
 
+def test_env_bool_strips_inline_comment(monkeypatch):
+    monkeypatch.setenv("WAITLIST_SEND_ACK", "true   # start false, flip after tests")
+    assert fs.env_bool("WAITLIST_SEND_ACK", False) is True
+
+
 def test_browser_headers_required(monkeypatch):
     monkeypatch.setenv("FORM_REQUIRE_TURNSTILE", "false")
     monkeypatch.setenv("FORM_REQUIRE_NONCE", "false")

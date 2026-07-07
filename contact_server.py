@@ -28,6 +28,7 @@ from flask import Flask, jsonify, request, send_from_directory
 
 from form_security import (
     client_ip,
+    env_bool,
     evaluate_submission,
     form_nonce_required,
     forms_enabled,
@@ -161,8 +162,8 @@ def _email_routing_info() -> dict[str, object]:
     contact_to = _inbox_for_kind("contact")
     waitlist_to = _inbox_for_kind("waitlist")
     from_addr = _smtp_from_addr(contact_to)
-    send_ack = os.environ.get("WAITLIST_SEND_ACK", "false").lower() in ("1", "true", "yes")
-    contact_send_ack = os.environ.get("CONTACT_SEND_ACK", "false").lower() in ("1", "true", "yes")
+    send_ack = env_bool("WAITLIST_SEND_ACK", False)
+    contact_send_ack = env_bool("CONTACT_SEND_ACK", False)
     return {
         "smtp_user": os.environ.get("SMTP_USER", "").strip(),
         "smtp_from": from_addr,
@@ -205,7 +206,7 @@ def _send_contact_email(
     log.info("contact: sending notification to %s from %s for %s", to_addr, from_addr, reply_email)
     _smtp_send_message(msg)
 
-    send_ack = os.environ.get("CONTACT_SEND_ACK", "false").lower() in ("1", "true", "yes")
+    send_ack = env_bool("CONTACT_SEND_ACK", False)
     if not send_ack or not from_addr or not _valid_email(reply_email):
         return
 
@@ -261,7 +262,7 @@ def _send_waitlist_emails(
     log.info("waitlist: sending notification to %s from %s for %s", to_addr, from_addr, reply_email)
     _smtp_send_message(msg_in)
 
-    send_ack = os.environ.get("WAITLIST_SEND_ACK", "false").lower() in ("1", "true", "yes")
+    send_ack = env_bool("WAITLIST_SEND_ACK", False)
     if not send_ack or not from_addr or not _valid_email(reply_email):
         return
 
