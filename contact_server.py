@@ -162,12 +162,14 @@ def _email_routing_info() -> dict[str, object]:
     waitlist_to = _inbox_for_kind("waitlist")
     from_addr = _smtp_from_addr(contact_to)
     send_ack = os.environ.get("WAITLIST_SEND_ACK", "false").lower() in ("1", "true", "yes")
+    contact_send_ack = os.environ.get("CONTACT_SEND_ACK", "false").lower() in ("1", "true", "yes")
     return {
         "smtp_user": os.environ.get("SMTP_USER", "").strip(),
         "smtp_from": from_addr,
         "contact_to_email": contact_to,
         "waitlist_to_email": waitlist_to,
         "waitlist_send_ack": send_ack,
+        "contact_send_ack": contact_send_ack,
         "same_mailbox_loop": from_addr.lower() in {contact_to.lower(), waitlist_to.lower()},
     }
 
@@ -200,7 +202,26 @@ def _send_contact_email(
     msg["To"] = to_addr
     msg["Reply-To"] = reply_email
     msg.set_content(text)
+    log.info("contact: sending notification to %s from %s for %s", to_addr, from_addr, reply_email)
     _smtp_send_message(msg)
+
+    send_ack = os.environ.get("CONTACT_SEND_ACK", "false").lower() in ("1", "true", "yes")
+    if not send_ack or not from_addr or not _valid_email(reply_email):
+        return
+
+    ack_body = (
+        f"Hi {name},\n\n"
+        f"Thank you for contacting Profitru. We have received your message and will "
+        f"get back to you as soon as we can.\n\n"
+        f"If your question is urgent, you can also reach us at support@profitru.com.\n\n"
+        f"— The Profitru team\n"
+    )
+    msg_ack = EmailMessage()
+    msg_ack["Subject"] = "We received your message — Profitru"
+    msg_ack["From"] = from_addr
+    msg_ack["To"] = reply_email
+    msg_ack.set_content(ack_body)
+    _smtp_send_message(msg_ack)
 
 
 def _send_waitlist_emails(
@@ -272,7 +293,7 @@ def _submission_guard(kind: str, data: dict, *, email: str, subject: str = "", t
         text_parts=text_parts,
     )
     if silent:
-        log.info("%s: blocked submission from %s (spam/timing/honeypot)", kind, ip)
+        log.info("%s: blocked submission from %s (spam/security)", kind, ip)
         return jsonify({"ok": True})
     if err:
         status = 503 if not forms_enabled() else 429 if "Too many" in err else 400
@@ -445,6 +466,7 @@ def api_form_config():
         "turnstile_configured": turnstile_secret_configured() and bool(turnstile_site_key()),
         "form_nonce_required": form_nonce_required(),
         "waitlist_send_ack": _email_routing_info()["waitlist_send_ack"],
+        "contact_send_ack": _email_routing_info()["contact_send_ack"],
     }
     if form_nonce_required():
         payload["form_nonce"] = issue_form_nonce()

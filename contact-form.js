@@ -31,7 +31,7 @@
       return;
     }
     if (submitBtn) submitBtn.disabled = true;
-    setStatus("pending", "Sendingù");
+    setStatus("pending", "Sending\u2026");
 
     var submit = function () {
     var fd = new FormData(form);
@@ -67,10 +67,16 @@
       })
       .then(function (r) {
         if (r.ok && r.data && r.data.ok) {
-          var successMsg =
-            r.data.queued || r.data.email_sent === false
-              ? "Message received. We will get back to you soon."
-              : "Message sent. We will get back to you soon.";
+          var successMsg;
+          if (r.data.queued || r.data.email_sent === false) {
+            successMsg =
+              "Message received. Email notification is delayed; we still have your details and will follow up.";
+          } else if (window.ProfitruFormSecurity && window.ProfitruFormSecurity.contactSendAckEnabled()) {
+            successMsg =
+              "Message sent. Check your email for a confirmation, and we will get back to you soon.";
+          } else {
+            successMsg = "Message sent. We will get back to you soon.";
+          }
           setStatus("success", successMsg);
           form.reset();
           if (window.ProfitruFormSecurity) {

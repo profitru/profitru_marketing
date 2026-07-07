@@ -42,6 +42,17 @@ def main() -> int:
         _smtp_send_message(msg)
     except Exception as exc:
         print("FAILED:", exc)
+        err = str(exc)
+        if "535" in err or "Authentication unsuccessful" in err:
+            print()
+            print("535 usually means Microsoft 365 rejected SMTP login for this mailbox.")
+            print("Checklist:")
+            print("  1. SMTP_USER must be the full address, e.g. info@profitru.com")
+            print("  2. If MFA is on, SMTP_PASSWORD must be an app password (not the normal login password)")
+            print("  3. Enable SMTP AUTH for this mailbox in Exchange admin:")
+            print("     Mailboxes -> info@ -> Email apps -> Authenticated SMTP = enabled")
+            print("  4. Or PowerShell: Set-CASMailbox -Identity info@profitru.com -SmtpClientAuthenticationDisabled $false")
+            print("  5. Set CONTACT_FROM_EMAIL=info@profitru.com to match SMTP_USER")
         return 1
     print("OK: test email sent. Check the inbox (and spam folder) for", to_addr)
     return 0

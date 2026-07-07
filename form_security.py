@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import hmac
 import json
 import logging
 import os
@@ -12,6 +14,7 @@ import time
 import urllib.parse
 import urllib.request
 from collections import defaultdict, deque
+from pathlib import Path
 from typing import Any
 
 log = logging.getLogger(__name__)
@@ -80,8 +83,48 @@ _ALLOWED_TURNSTILE_HOSTNAMES = (
 
 _lock = threading.Lock()
 _hits: dict[str, deque[float]] = defaultdict(deque)
-_nonces: dict[str, float] = {}
-_used_turnstile_tokens: dict[str, float] = {}
+
+
+def _nonce_secret() -> bytes:
+    for name in ("FORM_NONCE_SECRET", "TURNSTILE_SECRET_KEY"):
+        raw = os.environ.get(name, "").strip()
+        if raw:
+            return raw.encode()
+    return b"profitru-marketing-nonce-dev"
+
+
+def _turnstile_store_path() -> Path:
+    configured = os.environ.get("FORM_FALLBACK_DIR", "").strip()
+    if configured:
+        base = Path(configured).expanduser()
+    else:
+        base = Path(__file__).resolve().parent / "data" / "submissions"
+    base.mkdir(parents=True, exist_ok=True)
+    return base / ".turnstile_used.json"
+
+
+def _turnstile_token_already_used(token_key: str, ttl: int) -> bool:
+    """Cross-process Turnstile replay guard (works with multiple gunicorn workers)."""
+    digest = hashlib.sha256(token_key.encode()).hexdigest()
+    now = time.time()
+    path = _turnstile_store_path()
+    with _lock:
+        try:
+            if path.exists():
+                store = json.loads(path.read_text(encoding="utf-8"))
+            else:
+                store = {}
+        except (OSError, json.JSONDecodeError):
+            store = {}
+        store = {k: v for k, v in store.items() if float(v) >= now}
+        if digest in store:
+            return True
+        store[digest] = now + ttl
+        try:
+            path.write_text(json.dumps(store), encoding="utf-8")
+        except OSError as exc:
+            log.warning("turnstile replay store write failed: %s", exc)
+        return False
 
 
 def _env_int(name: str, default: int) -> int:
@@ -103,13 +146,6 @@ def _env_bool(name: str, default: bool) -> bool:
     if raw is None or raw.strip() == "":
         return default
     return raw.strip().lower() in ("1", "true", "yes", "on")
-
-
-def _purge_expired(store: dict[str, float]) -> None:
-    now = time.time()
-    expired = [key for key, expires_at in store.items() if expires_at < now]
-    for key in expired:
-        del store[key]
 
 
 def forms_enabled() -> bool:
@@ -136,23 +172,37 @@ def form_nonce_required() -> bool:
 
 
 def issue_form_nonce() -> str:
+    """Signed nonce valid on any gunicorn worker (no in-memory store)."""
     ttl = _env_int("FORM_NONCE_TTL_SEC", 900)
-    nonce = secrets.token_urlsafe(24)
-    with _lock:
-        _purge_expired(_nonces)
-        _nonces[nonce] = time.time() + ttl
-    return nonce
+    expires = int(time.time()) + ttl
+    rnd = secrets.token_urlsafe(16)
+    payload = f"{expires}.{rnd}"
+    sig = hmac.new(_nonce_secret(), payload.encode(), hashlib.sha256).hexdigest()
+    return f"{payload}.{sig}"
 
 
 def consume_form_nonce(raw: str) -> bool:
     if not form_nonce_required():
         return True
-    nonce = (raw or "").strip()
-    if not nonce:
+    token = (raw or "").strip()
+    if not token or token.count(".") != 2:
+        log.info("form nonce missing or malformed")
         return False
-    with _lock:
-        expires_at = _nonces.pop(nonce, None)
-    return expires_at is not None and expires_at >= time.time()
+    expires_s, rnd, sig = token.split(".", 2)
+    try:
+        expires = int(expires_s)
+    except ValueError:
+        log.info("form nonce expiry invalid")
+        return False
+    if expires < time.time():
+        log.info("form nonce expired")
+        return False
+    payload = f"{expires_s}.{rnd}"
+    expected = hmac.new(_nonce_secret(), payload.encode(), hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(sig, expected):
+        log.info("form nonce signature invalid")
+        return False
+    return True
 
 
 def client_ip(headers: dict[str, str], remote_addr: str | None) -> str:
@@ -290,17 +340,14 @@ def verify_turnstile(token: str, remote_ip: str | None, *, expected_action: str 
         return False
     if expected_action:
         action = str(body.get("action") or "").strip()
-        if action != expected_action:
+        if action and action != expected_action:
             log.info("turnstile action rejected: got %r expected %r", action, expected_action)
             return False
     token_key = token.strip()
     ttl = _env_int("TURNSTILE_TOKEN_TTL_SEC", 600)
-    with _lock:
-        _purge_expired(_used_turnstile_tokens)
-        if token_key in _used_turnstile_tokens:
-            log.info("turnstile token replay blocked")
-            return False
-        _used_turnstile_tokens[token_key] = time.time() + ttl
+    if _turnstile_token_already_used(token_key, ttl):
+        log.info("turnstile token replay blocked")
+        return False
     return True
 
 
@@ -326,9 +373,11 @@ def evaluate_submission(
         return ("Form is temporarily unavailable. Please email support@profitru.com.", False)
 
     if not origin_allowed(headers):
+        log.info("form block [%s] %s: origin not allowed", kind, ip)
         return (None, True)
 
     if not browser_submission_ok(headers):
+        log.info("form block [%s] %s: browser headers", kind, ip)
         return (None, True)
 
     if global_rate_limit_exceeded(ip):
@@ -338,21 +387,26 @@ def evaluate_submission(
         return ("Too many submissions from your network. Please try again later.", False)
 
     if not form_timing_ok(data):
+        log.info("form block [%s] %s: timing", kind, ip)
         return (None, True)
 
     if not consume_form_nonce(str(data.get("form_nonce") or "")):
+        log.info("form block [%s] %s: form nonce", kind, ip)
         return (None, True)
 
     if turnstile_required():
         token = str(data.get("turnstile_token") or "").strip()
         if not verify_turnstile(token, ip, expected_action=kind):
+            log.info("form block [%s] %s: turnstile", kind, ip)
             return (None, True)
 
     if disposable_email(email):
+        log.info("form block [%s] %s: disposable email", kind, ip)
         return (None, True)
 
     combined = (subject, *text_parts)
     if _looks_spam(*combined):
+        log.info("form block [%s] %s: spam content", kind, ip)
         return (None, True)
 
     return (None, False)

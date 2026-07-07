@@ -196,12 +196,36 @@ If SMTP is misconfigured, submissions are still saved under `data/submissions/*.
 
 **Office 365 / Microsoft 365:** use `SMTP_HOST=smtp.office365.com`, port `587`, STARTTLS enabled. Basic auth must be allowed for the mailbox, or use an app password if MFA is on. A `535 Authentication unsuccessful` error means the password or auth policy needs updating in `.env`.
 
-If Outlook shows *“sending email address was not recognized as a valid sender”* for `[Profitru waitlist]` messages, `support@profitru.com` was likely restricted after bot spam. Fix:
+**535 Authentication unsuccessful:** Microsoft rejected the SMTP login (different from **550 AS(42004)** sender block). Fix:
 
-1. Set `CONTACT_TO_EMAIL=founder@profitru.com` and `WAITLIST_TO_EMAIL=founder@profitru.com` in the **server** `.env` (keep `SMTP_USER=support@profitru.com` if that is your authenticated sender).
-2. In Microsoft 365 admin: **Email & collaboration → Review → Restricted users** — unblock `support@profitru.com` if listed.
-3. Ensure **SPF**, **DKIM**, and **DMARC** are valid for `profitru.com`.
-4. Keep `WAITLIST_SEND_ACK=false` until reputation recovers.
-5. Restart: `sudo systemctl restart profitru-marketing`.
+1. `SMTP_USER=info@profitru.com` (full address) and `CONTACT_FROM_EMAIL=info@profitru.com` (must match for Office 365).
+2. If MFA is enabled on the mailbox, create an **app password** and put it in `SMTP_PASSWORD` (normal account password will not work).
+3. Enable **Authenticated SMTP** for the mailbox: Exchange admin → **Recipients → Mailboxes** → select mailbox → **Email apps** → turn on **Authenticated SMTP**. Or PowerShell: `Set-CASMailbox -Identity info@profitru.com -SmtpClientAuthenticationDisabled $false`
+4. If still failing, check tenant SMTP AUTH: `Get-TransportConfig | fl SmtpClientAuthenticationDisabled` (must be `False`).
+5. Re-run on the server: `python scripts/test_smtp.py`
+
+If Outlook shows *“sending email address was not recognized as a valid sender”* or **`550 5.1.8 Access denied, bad outbound sender AS(42004)`**, Microsoft has **blocked outbound mail from that mailbox** (usually after bot spam). Changing `WAITLIST_TO_EMAIL` alone does **not** fix this — the **sender** (`SMTP_USER`) is restricted.
+
+**Fix option A — unblock `support@` (recommended long-term)**
+
+1. [Microsoft 365 admin center](https://admin.microsoft.com) → **Email & collaboration** → **Review** → **Restricted users** — remove `support@profitru.com` if listed.
+2. **Security** → **Email & collaboration** → **Threat policies** — check **Restricted entities** / outbound spam.
+3. Open a Microsoft support ticket with the NDR text and error **AS(42004)** if the mailbox stays blocked after 24–48h.
+4. Validate **SPF**, **DKIM**, and **DMARC** for `profitru.com` (DNS).
+5. Keep `WAITLIST_SEND_ACK=false` until sending works reliably.
+
+**Fix option B — send from a different mailbox (fast workaround)**
+
+If `founder@profitru.com` is not restricted, on the **server** `.env`:
+
+```env
+SMTP_USER=founder@profitru.com
+SMTP_PASSWORD=<founder app password>
+CONTACT_FROM_EMAIL=founder@profitru.com
+CONTACT_TO_EMAIL=founder@profitru.com
+WAITLIST_TO_EMAIL=founder@profitru.com
+```
+
+Then `sudo systemctl restart profitru-marketing` and run `python scripts/test_smtp.py`.
 
 Missed submissions may still be in `data/submissions/waitlist.jsonl` on the server when SMTP failed or mail bounced.

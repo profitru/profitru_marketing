@@ -124,7 +124,7 @@ def test_form_nonce_is_one_time(monkeypatch):
     monkeypatch.setenv("FORM_MIN_FILL_SECONDS", "3")
     monkeypatch.setenv("FORM_GLOBAL_RATE_LIMIT_MAX", "100")
     monkeypatch.setenv("FORM_RATE_LIMIT_MAX_CONTACT", "10")
-    fs._nonces.clear()
+    monkeypatch.setenv("TURNSTILE_SECRET_KEY", "test-nonce-secret")
     fs._hits.clear()
     nonce = fs.issue_form_nonce()
     data = {"form_started_at": int(time.time() * 1000) - 6000, "form_nonce": nonce}
@@ -138,13 +138,23 @@ def test_form_nonce_is_one_time(monkeypatch):
         text_parts=("msg",),
     )
     assert err is None and silent is False
+
+
+def test_form_nonce_rejects_invalid(monkeypatch):
+    monkeypatch.setenv("FORM_REQUIRE_TURNSTILE", "false")
+    monkeypatch.setenv("FORM_REQUIRE_BROWSER_HEADERS", "false")
+    monkeypatch.setenv("FORM_REQUIRE_NONCE", "true")
+    monkeypatch.setenv("FORM_MIN_FILL_SECONDS", "3")
+    monkeypatch.setenv("FORM_GLOBAL_RATE_LIMIT_MAX", "100")
+    monkeypatch.setenv("FORM_RATE_LIMIT_MAX_CONTACT", "10")
+    fs._hits.clear()
     err, silent = fs.evaluate_submission(
         kind="contact",
         ip="10.0.0.2",
         headers=_headers(),
-        data=data,
+        data={"form_started_at": int(time.time() * 1000) - 6000, "form_nonce": "bad.token.here"},
         email="seller@example.com",
-        subject="Hello again",
+        subject="Hello",
         text_parts=("msg",),
     )
     assert err is None and silent is True

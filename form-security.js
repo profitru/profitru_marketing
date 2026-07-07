@@ -3,6 +3,7 @@
   var turnstileRequired = false;
   var formNonce = "";
   var waitlistSendAck = false;
+  var contactSendAck = false;
   var widgets = {};
 
   function apiBase() {
@@ -87,6 +88,7 @@
     turnstileRequired = !!cfg.turnstile_required;
     if (cfg.form_nonce) formNonce = cfg.form_nonce;
     waitlistSendAck = !!cfg.waitlist_send_ack;
+    contactSendAck = !!cfg.contact_send_ack;
   }
 
   function loadConfig() {
@@ -159,6 +161,9 @@
     },
     waitlistSendAckEnabled: function () {
       return waitlistSendAck;
+    },
+    contactSendAckEnabled: function () {
+      return contactSendAck;
     },
     ensureReady: function () {
       if (!formNonce) {
