@@ -1,6 +1,7 @@
 (function () {
   var configuredSiteKey = "";
   var turnstileRequired = false;
+  var formNonce = "";
   var widgets = {};
 
   function apiBase() {
@@ -56,14 +57,22 @@
     setSubmitEnabled(false);
   }
 
+  function turnstileAction(containerId) {
+    if (containerId === "contact-turnstile") return "contact";
+    if (containerId === "waitlist-turnstile") return "waitlist";
+    return "";
+  }
+
   function mountTurnstile(containerId) {
     var key = turnstileSiteKey();
     var container = document.getElementById(containerId);
     if (!key || !container || !window.turnstile || widgets[containerId]) return false;
+    var action = turnstileAction(containerId);
     widgets[containerId] = window.turnstile.render(container, {
       sitekey: key,
       theme: "auto",
       appearance: "always",
+      action: action,
       callback: onTurnstileReady,
       "expired-callback": onTurnstileInvalid,
       "error-callback": onTurnstileInvalid,
@@ -71,18 +80,24 @@
     return true;
   }
 
+  function applyConfig(cfg) {
+    if (!cfg) return;
+    if (cfg.turnstile_site_key) configuredSiteKey = cfg.turnstile_site_key.trim();
+    turnstileRequired = !!cfg.turnstile_required;
+    if (cfg.form_nonce) formNonce = cfg.form_nonce;
+  }
+
   function loadConfig() {
     var base = apiBase();
     if (!base) return Promise.resolve();
-    return fetch(base + "/api/form-config", { headers: { Accept: "application/json" } })
+    return fetch(base + "/api/form-config", {
+      headers: { Accept: "application/json" },
+      credentials: "same-origin",
+    })
       .then(function (res) {
         return res.ok ? res.json() : null;
       })
-      .then(function (cfg) {
-        if (!cfg) return;
-        if (cfg.turnstile_site_key) configuredSiteKey = cfg.turnstile_site_key.trim();
-        turnstileRequired = !!cfg.turnstile_required;
-      })
+      .then(applyConfig)
       .catch(function () {
         /* keep defaults */
       });
@@ -132,9 +147,18 @@
       return {
         form_started_at: window.ProfitruFormSecurity.formStartedAt,
         turnstile_token: window.ProfitruFormSecurity.turnstileToken(),
+        form_nonce: formNonce,
       };
     },
+    refreshSecurity: function () {
+      return loadConfig().then(function () {
+        window.ProfitruFormSecurity.resetTurnstile();
+      });
+    },
     ensureReady: function () {
+      if (!formNonce) {
+        return Promise.reject(new Error("Form security is still loading. Wait a moment and try again."));
+      }
       if (!window.ProfitruFormSecurity.isTurnstileRequired()) return Promise.resolve();
       if (window.ProfitruFormSecurity.turnstileToken()) return Promise.resolve();
       return new Promise(function (resolve, reject) {

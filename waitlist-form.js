@@ -77,7 +77,7 @@
           form.reset();
           if (window.ProfitruFormSecurity) {
             window.ProfitruFormSecurity.formStartedAt = Date.now();
-            window.ProfitruFormSecurity.resetTurnstile();
+            window.ProfitruFormSecurity.refreshSecurity();
           }
         } else {
           var msg =

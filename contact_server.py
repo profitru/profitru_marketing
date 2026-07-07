@@ -29,7 +29,9 @@ from flask import Flask, jsonify, request, send_from_directory
 from form_security import (
     client_ip,
     evaluate_submission,
+    form_nonce_required,
     forms_enabled,
+    issue_form_nonce,
     turnstile_required,
     turnstile_secret_configured,
     turnstile_site_key,
@@ -397,13 +399,15 @@ def api_waitlist():
 
 @app.route("/api/form-config", methods=["GET"])
 def api_form_config():
-    return jsonify(
-        {
-            "turnstile_site_key": turnstile_site_key(),
-            "turnstile_required": turnstile_required(),
-            "turnstile_configured": turnstile_secret_configured() and bool(turnstile_site_key()),
-        }
-    )
+    payload = {
+        "turnstile_site_key": turnstile_site_key(),
+        "turnstile_required": turnstile_required(),
+        "turnstile_configured": turnstile_secret_configured() and bool(turnstile_site_key()),
+        "form_nonce_required": form_nonce_required(),
+    }
+    if form_nonce_required():
+        payload["form_nonce"] = issue_form_nonce()
+    return jsonify(payload)
 
 
 @app.route("/api/health", methods=["GET"])
@@ -417,6 +421,7 @@ def api_health():
             "forms_enabled": forms_enabled(),
             "turnstile_required": turnstile_required(),
             "turnstile_configured": turnstile_secret_configured() and bool(turnstile_site_key()),
+            "form_nonce_required": form_nonce_required(),
             "fallback_dir": str(fallback),
             "fallback_writable": fallback.exists() and os.access(fallback, os.W_OK)
             if fallback.exists()
