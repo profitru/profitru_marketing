@@ -443,38 +443,102 @@ html[data-theme="dark"] .nav-links--slim > a:focus-visible {
 }
 
 .compare-pillar {
+  position: relative;
   padding: 1.35rem 1.4rem;
   border-radius: var(--radius, 16px);
   border: 1px solid var(--stroke, #e2e8f0);
   background: var(--bg-elevated, #fff);
+  transition: border-color 0.2s var(--ease, ease), box-shadow 0.2s var(--ease, ease);
+}
+
+.compare-pillar:not(.compare-pillar--us) {
+  opacity: 0.82;
+  background: color-mix(in srgb, var(--bg-elevated, #fff) 88%, var(--bg-deep, #f1f5f9));
 }
 
 .compare-pillar--us {
-  border-color: var(--accent, #2563eb);
-  box-shadow: 0 0 0 1px var(--accent, #2563eb);
   order: -1;
+  opacity: 1;
+  border: 2px solid var(--accent, #2563eb);
+  background:
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--accent, #2563eb) 14%, #fff) 0%,
+      color-mix(in srgb, var(--accent, #2563eb) 6%, #fff) 45%,
+      #fff 100%
+    );
+  box-shadow:
+    0 12px 36px rgba(37, 99, 235, 0.18),
+    0 0 0 1px rgba(37, 99, 235, 0.12);
+  padding-top: 1.55rem;
+}
+
+.compare-pillar--us::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.85rem;
+  bottom: 0.85rem;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: var(--accent, #2563eb);
+}
+
+html[data-theme="dark"] .compare-pillar:not(.compare-pillar--us) {
+  opacity: 0.75;
+  background: color-mix(in srgb, var(--bg-elevated, #1e293b) 90%, #000);
+}
+
+html[data-theme="dark"] .compare-pillar--us {
+  background:
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--accent, #2563eb) 28%, var(--bg-elevated, #1e293b)) 0%,
+      color-mix(in srgb, var(--accent, #2563eb) 12%, var(--bg-elevated, #1e293b)) 100%
+    );
+  box-shadow:
+    0 14px 40px rgba(37, 99, 235, 0.28),
+    0 0 0 1px rgba(96, 165, 250, 0.25);
 }
 
 @media (min-width: 900px) {
   .compare-pillar--us {
     order: 0;
+    transform: translateY(-0.35rem) scale(1.02);
+    z-index: 1;
   }
   .compare-pillars {
-    grid-template-columns: 1.15fr 1fr 1fr;
+    grid-template-columns: 1.22fr 1fr 1fr;
+    align-items: stretch;
   }
 }
 
 .compare-pillar__badge {
   display: inline-block;
-  margin: 0 0 0.65rem;
-  padding: 0.25rem 0.55rem;
-  font-size: 0.68rem;
+  margin: 0 0 0.75rem;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.7rem;
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+  white-space: nowrap;
   color: #fff;
   background: var(--accent, #2563eb);
-  border-radius: 6px;
+  border-radius: 999px;
+}
+
+.compare-pillar--us .compare-pillar__who {
+  color: var(--accent-deep, #1d4ed8);
+  font-size: 0.78rem;
+}
+
+.compare-pillar--us h3 {
+  font-size: 1.28rem;
+  letter-spacing: -0.02em;
+}
+
+.compare-pillar--us > p:last-child {
+  color: var(--text, #0f172a);
 }
 
 .compare-edge-grid {
