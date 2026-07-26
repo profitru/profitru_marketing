@@ -4,25 +4,37 @@
     <loc>https://profitru.com/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <lastmod>2026-04-13</lastmod>
+    <lastmod>2026-07-27</lastmod>
+  </url>
+  <url>
+    <loc>https://profitru.com/product/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <lastmod>2026-07-27</lastmod>
+  </url>
+  <url>
+    <loc>https://profitru.com/pricing/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <lastmod>2026-07-27</lastmod>
   </url>
   <url>
     <loc>https://profitru.com/contact.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2026-04-13</lastmod>
+    <lastmod>2026-07-27</lastmod>
   </url>
   <url>
     <loc>https://profitru.com/waitlist.html</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
-    <lastmod>2026-04-24</lastmod>
+    <priority>0.7</priority>
+    <lastmod>2026-07-27</lastmod>
   </url>
   <url>
     <loc>https://profitru.com/blog/index.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
-    <lastmod>2026-04-14</lastmod>
+    <lastmod>2026-07-27</lastmod>
   </url>
   <url>
     <loc>https://profitru.com/blog/multi-channel-margin-one-truth/index.html</loc>
@@ -109,28 +121,28 @@
     <lastmod>2026-04-14</lastmod>
   </url>
   <url>
-    <loc>https://profitru.com/amazon-profit-calculator/index.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
-    <lastmod>2026-04-13</lastmod>
+    <loc>https://profitru.com/amazon-profit-calculator/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <lastmod>2026-07-27</lastmod>
   </url>
   <url>
     <loc>https://profitru.com/flipkart-profit-calculator/index.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
-    <lastmod>2026-04-13</lastmod>
+    <lastmod>2026-07-27</lastmod>
   </url>
   <url>
     <loc>https://profitru.com/ecommerce-profit-calculator/index.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
-    <lastmod>2026-04-13</lastmod>
+    <lastmod>2026-07-27</lastmod>
   </url>
   <url>
     <loc>https://profitru.com/multi-channel-profit-calculator/index.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
-    <lastmod>2026-04-13</lastmod>
+    <lastmod>2026-07-27</lastmod>
   </url>
   <url>
     <loc>https://profitru.com/policies/index.html</loc>

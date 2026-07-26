@@ -16,28 +16,29 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#2563eb">
-  <meta name="description" content="Learn what belongs in an Amazon India profit calculation: referral and FBA fees, ads, returns, GST, and inventory. See why spreadsheets drift&mdash;and how to track true net margin.">
+  <meta name="description" content="Free Amazon India profit calculator: estimate real unit contribution after referral fees, FBA, ads, returns, and COGS. See why payout is not profit.">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://profitru.com/amazon-profit-calculator/index.html">
-  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://profitru.com/amazon-profit-calculator/">
+  <meta property="og:type" content="website">
   <meta property="og:locale" content="en_IN">
-  <meta property="og:title" content="Amazon profit calculator for Indian sellers &mdash; real margin, not payout fiction | Profitru">
-  <meta property="og:description" content="Learn what belongs in an Amazon India profit calculation: referral and FBA fees, ads, returns, GST, and inventory.">
-  <meta property="og:url" content="https://profitru.com/amazon-profit-calculator/index.html">
+  <meta property="og:title" content="Free Amazon profit calculator (India) — payout vs real margin | Profitru">
+  <meta property="og:description" content="Interactive Amazon.in unit economics: fees, ads, returns, COGS. Instantly see the gap between settlement-style payout and real contribution.">
+  <meta property="og:url" content="https://profitru.com/amazon-profit-calculator/">
   <meta property="og:site_name" content="Profitru">
   <meta property="og:image" content="https://profitru.com/logos/profitru/profitru-logo-horizontal.png">
   <meta property="og:image:width" content="900">
   <meta property="og:image:height" content="400">
   <meta property="og:image:alt" content="Profitru logo">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Amazon profit calculator for Indian sellers | Profitru">
-  <meta name="twitter:description" content="What to include in an Amazon India profit picture: fees, ads, returns, GST, inventory&mdash;and why payouts mislead.">
+  <meta name="twitter:title" content="Free Amazon profit calculator (India) | Profitru">
+  <meta name="twitter:description" content="Estimate Amazon.in contribution after fees, ads, returns, and COGS. Payout is not profit.">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[
-    {"@type":"WebPage","@id":"https://profitru.com/amazon-profit-calculator/index.html","name":"Amazon profit calculator for Indian sellers","description":"Framework for Amazon India net profit: marketplace fees, fulfilment, advertising, returns, GST, and inventory.","url":"https://profitru.com/amazon-profit-calculator/index.html","isPartOf":{"@type":"WebSite","name":"Profitru","url":"https://profitru.com/"}},
+    {"@type":"WebApplication","name":"Amazon India profit calculator","applicationCategory":"BusinessApplication","operatingSystem":"Web","url":"https://profitru.com/amazon-profit-calculator/","description":"Interactive estimator for Amazon.in unit contribution after referral fees, fulfilment, ads, returns, and COGS.","offers":{"@type":"Offer","price":"0","priceCurrency":"INR"},"provider":{"@type":"Organization","name":"Profitru","url":"https://profitru.com/"}},
+    {"@type":"WebPage","@id":"https://profitru.com/amazon-profit-calculator/","name":"Amazon profit calculator for Indian sellers","description":"Free interactive Amazon India profit calculator: fees, ads, returns, COGS.","url":"https://profitru.com/amazon-profit-calculator/","isPartOf":{"@type":"WebSite","name":"Profitru","url":"https://profitru.com/"}},
     {"@type":"BreadcrumbList","itemListElement":[
       {"@type":"ListItem","position":1,"name":"Home","item":"https://profitru.com/"},
-      {"@type":"ListItem","position":2,"name":"Amazon profit calculator","item":"https://profitru.com/amazon-profit-calculator/index.html"}
+      {"@type":"ListItem","position":2,"name":"Amazon profit calculator","item":"https://profitru.com/amazon-profit-calculator/"}
     ]}
   ]}
   </script>
@@ -65,7 +66,7 @@
       if (meta) meta.setAttribute("content", theme === "dark" ? "#0f172a" : "#2563eb");
     })();
   </script>
-  <title>Amazon profit calculator for Indian sellers &mdash; real margin, not payout fiction | Profitru</title>
+  <title>Free Amazon profit calculator (India) — payout vs real margin | Profitru</title>
   <link rel="icon" type="image/png" href="../logos/profitru/profitru-favicon.png?v=profitru-direct-2026-04" sizes="any">
   <link rel="apple-touch-icon" href="../logos/profitru/profitru-favicon.png?v=profitru-direct-2026-04">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -74,6 +75,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet"></noscript>
   <link rel="stylesheet" href="../styles.css?v=profitru-2026-04-13-perf">
+  <link rel="stylesheet" href="../redesign-2026.css?v=2026-07-27">
   <link rel="stylesheet" href="../nav-dropdown.css?v=2026-05-05-dark-nav">
   <link rel="stylesheet" href="../policies.css?v=profitru-2026-04-13">
 </head>
@@ -102,42 +104,13 @@
         <img src="../logos/profitru/profitru-logo-horizontal.png?v=profitru-direct-2026-04" width="900" height="400" alt="Profitru logo &mdash; Turn data into profit." class="logo-img" fetchpriority="high" decoding="async">
       </a>
       <div class="nav-end">
-        <nav class="nav-links nav-links--mega" id="nav-menu" aria-label="Primary">
-          <div class="nav-mega" data-nav-dropdown>
-            <button type="button" class="nav-mega__btn" id="nav-btn-product" aria-expanded="false" aria-controls="nav-panel-product" aria-haspopup="true">Product</button>
-            <div class="nav-mega__panel" id="nav-panel-product" role="region" aria-labelledby="nav-btn-product" hidden>
-              <div class="nav-mega__stack">
-                <a href="/#pains">Problem</a>
-                <a href="/#how">How it works</a>
-                <a href="/#features">What you get</a>
-                <a href="/#demo">See it in action</a>
-                <a href="/#faq">FAQ</a>
-                <a href="/#cta">Get started</a>
-                <a href="/#built-for">Why Profitru</a>
-              </div>
-            </div>
-          </div>
-          <div class="nav-mega" data-nav-dropdown>
-            <button type="button" class="nav-mega__btn" id="nav-btn-resources" aria-expanded="false" aria-controls="nav-panel-resources" aria-haspopup="true">Resources</button>
-            <div class="nav-mega__panel" id="nav-panel-resources" role="region" aria-labelledby="nav-btn-resources" hidden>
-              <div class="nav-mega__stack">
-                <a href="/#guides">Guides hub</a>
-                <a href="/blog/index.html">Blog</a>
-              </div>
-            </div>
-          </div>
-          <div class="nav-mega" data-nav-dropdown>
-            <button type="button" class="nav-mega__btn" id="nav-btn-company" aria-expanded="false" aria-controls="nav-panel-company" aria-haspopup="true">Company</button>
-            <div class="nav-mega__panel" id="nav-panel-company" role="region" aria-labelledby="nav-btn-company" hidden>
-              <div class="nav-mega__stack">
-                <a href="/contact.html">Contact</a>
-                <a href="/policies/index.html">Policies &amp; legal</a>
-              </div>
-            </div>
-          </div>
-          <a href="/waitlist.html" class="btn btn-primary nav-mega__cta">Join the waitlist</a>
-          <a href="https://bookings.cloud.microsoft/book/Proiftrudemo@profitru.com/" class="nav-mega__login" target="_blank" rel="noopener noreferrer">Book a demo</a>
-          <a href="https://profitru.app/login" class="nav-mega__login">Log in</a>
+                <nav class="nav-links nav-links--slim" id="nav-menu" aria-label="Primary">
+          <a href="/product/">Product</a>
+          <a href="/pricing/">Pricing</a>
+          <a href="/blog/index.html">Guides</a>
+          <a href="https://bookings.cloud.microsoft/book/Proiftrudemo@profitru.com/" class="nav-slim__link" target="_blank" rel="noopener noreferrer">Book a demo</a>
+          <a href="https://profitru.app/login" class="nav-slim__link">Log in</a>
+          <a href="https://profitru.app/signup" class="btn btn-primary nav-slim__cta">Start free trial</a>
         </nav>
         <button type="button" class="theme-toggle" data-theme-toggle="1" aria-label="Switch theme">
           <svg class="theme-toggle__moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
@@ -151,56 +124,33 @@
   <main id="main" class="policies-hub">
     <div class="container">
       <div class="policies-hub__intro">
-        <p class="eyebrow">Profit guides</p>
-        <h1>Amazon profit calculator (India): what actually belongs in your net margin</h1>
+        <p class="eyebrow">Free tool</p>
+        <h1>Amazon profit calculator (India)</h1>
         <p>
-          Sellers often mistake Amazon disbursements for profit. A serious <strong>Amazon profit calculator</strong> for the Indian marketplace has to fold in referral and fulfilment fees, advertising, returns, inventory carrying cost, and GST treatment&mdash;not just the amount that hits your bank.
+          Adjust price, fees, ads, returns, and COGS. Instantly see the gap between a
+          <strong>settlement-style payout</strong> and your <strong>real contribution per unit</strong>.
         </p>
       </div>
 
       <div class="policy-page__inner">
-        <article class="policy-article">
-          <h2>Why payout reports mislead</h2>
-          <p>
-            Settlement files show what Amazon paid after its deductions, but they do not always line up with your true SKU economics. Promotions, Lightning Deals, blended FBA vs self-ship, and category changes can shift fee stacks mid-quarter. Without tying every order back to landed cost and return flow, you are optimising a moving average&mdash;not the products that fund your business.
-          </p>
-
-          <h2>Line items to include for Amazon.in</h2>
-          <ul>
-            <li><strong>Referral and closing fees</strong> by category; watch for rate card updates.</li>
-            <li><strong>Fulfilment</strong>: FBA pick &amp; pack, storage, removals, and inbound placement versus self-ship courier and packaging.</li>
-            <li><strong>Advertising</strong>: Sponsored Products, Brands, and DSP spend allocated to ASINs, not blended at account level.</li>
-            <li><strong>Returns and reimbursements</strong>: return rate by ASIN, refund fees, and inventory that never comes back sellable.</li>
-            <li><strong>Inventory</strong>: dead stock, ageing FBA units, and stockouts that cost rank and margin.</li>
-            <li><strong>Taxes and compliance</strong>: GST on fees and output tax on sales, matched to your filing workflow.</li>
-          </ul>
-
-          <h2>From spreadsheet to a number you can trust</h2>
-          <p>
-            The goal is not a one-off calculator cell but a repeatable view: net margin after all variable and allocated fixed costs, refreshed as often as you receive orders. That is where generic templates break&mdash;they cannot keep pace with catalogue changes, fee experiments, and multi-brand accounting.
-          </p>
-          <p>
-            Profitru is built for Indian sellers who need that continuity across channels: connect data once, reconcile returns and procurement alongside marketplace payouts, and see where margin leaks before you commit more inventory.
-          </p>
-
-          <div class="policy-callout">
-            <strong>Try it on your data</strong>
-            Join the waitlist at <a href="/waitlist.html">profitru.app</a> and move from theoretical margin to numbers tied to your catalogue and operations.
-          </div>
-        </article>
-
-        <div class="profit-calc" data-amazon-profit-calc>
-          <h2 class="profit-calc__title">Illustrative Amazon.in unit economics</h2>
+        <div class="profit-calc profit-calc--hero" data-amazon-profit-calc>
+          <h2 class="profit-calc__title">Try it on your numbers</h2>
           <p class="profit-calc__lead">
-            Adjust inputs to stress-test contribution per unit. Return rate scales down contribution (simple model). Not tax advice; GST and ITC follow your filings.
+            Pick a category preset or type your own values. Illustrative only — not tax advice.
           </p>
+          <div class="profit-calc__presets" role="group" aria-label="Category presets">
+            <button type="button" class="profit-calc__preset is-active" data-calc-preset="home">Home &amp; kitchen</button>
+            <button type="button" class="profit-calc__preset" data-calc-preset="fashion">Fashion</button>
+            <button type="button" class="profit-calc__preset" data-calc-preset="electronics">Electronics</button>
+            <button type="button" class="profit-calc__preset" data-calc-preset="beauty">Beauty</button>
+          </div>
           <div class="profit-calc__grid">
             <div class="profit-calc__field">
-              <label for="calc_price">Selling price (?)</label>
+              <label for="calc_price">Selling price (₹)</label>
               <input id="calc_price" name="calc_price" type="number" inputmode="decimal" min="0" step="1" value="899" autocomplete="off">
             </div>
             <div class="profit-calc__field">
-              <label for="calc_cogs">Landed cost / COGS (?)</label>
+              <label for="calc_cogs">Landed cost / COGS (₹)</label>
               <input id="calc_cogs" name="calc_cogs" type="number" inputmode="decimal" min="0" step="1" value="420" autocomplete="off">
             </div>
             <div class="profit-calc__field">
@@ -208,7 +158,7 @@
               <input id="calc_referral_pct" name="calc_referral_pct" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="15" autocomplete="off">
             </div>
             <div class="profit-calc__field">
-              <label for="calc_fulfilment">Fulfilment per unit (?)</label>
+              <label for="calc_fulfilment">Fulfilment per unit (₹)</label>
               <input id="calc_fulfilment" name="calc_fulfilment" type="number" inputmode="decimal" min="0" step="1" value="65" autocomplete="off">
             </div>
             <div class="profit-calc__field">
@@ -220,10 +170,24 @@
               <input id="calc_return_pct" name="calc_return_pct" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="12" autocomplete="off">
             </div>
           </div>
+
+          <div class="profit-calc__compare">
+            <div class="profit-calc__compare-card">
+              <p class="profit-calc__compare-label">Looks like after Amazon fees</p>
+              <p class="profit-calc__compare-value" data-calc-payout>&mdash;</p>
+              <p class="profit-calc__compare-note">Price − referral − fulfilment (ignores COGS, ads, returns)</p>
+            </div>
+            <div class="profit-calc__compare-card" data-calc-real-card>
+              <p class="profit-calc__compare-label">Real contribution after returns</p>
+              <p class="profit-calc__compare-value" data-calc-net>&mdash;</p>
+              <p class="profit-calc__compare-note">Also subtracts COGS + ads, then applies return rate</p>
+            </div>
+          </div>
+
           <div class="profit-calc__out">
             <div class="profit-calc__stat">
-              <div class="profit-calc__stat-label">Est. contribution after returns</div>
-              <div class="profit-calc__stat-value profit-calc__stat-value--accent" data-calc-net>&mdash;</div>
+              <div class="profit-calc__stat-label">Gap (payout-style − real)</div>
+              <div class="profit-calc__stat-value profit-calc__stat-value--accent" data-calc-gap>&mdash;</div>
             </div>
             <div class="profit-calc__stat">
               <div class="profit-calc__stat-label">Margin on selling price</div>
@@ -245,7 +209,41 @@
           <p class="profit-calc__disclaimer">
             Simplified model for discussion only. Excludes storage, removals, Lightning fees, promotions, reimbursements, and precise GST. Use Profitru for numbers tied to your live catalogue.
           </p>
+          <div class="profit-calc__cta">
+            <a href="https://profitru.app/signup" class="btn btn-primary">Start free trial</a>
+            <a href="https://bookings.cloud.microsoft/book/Proiftrudemo@profitru.com/" class="btn btn-ghost" target="_blank" rel="noopener noreferrer">Book a demo</a>
+          </div>
         </div>
+
+        <article class="policy-article">
+          <h2>Why payout reports mislead</h2>
+          <p>
+            Settlement files show what Amazon paid after its deductions, but they do not always line up with your true SKU economics. Promotions, Lightning Deals, blended FBA vs self-ship, and category changes can shift fee stacks mid-quarter. Without tying every order back to landed cost and return flow, you are optimising a moving average&mdash;not the products that fund your business.
+          </p>
+
+          <h2>Line items to include for Amazon.in</h2>
+          <ul>
+            <li><strong>Referral and closing fees</strong> by category; watch for rate card updates.</li>
+            <li><strong>Fulfilment</strong>: FBA pick &amp; pack, storage, removals, and inbound placement versus self-ship courier and packaging.</li>
+            <li><strong>Advertising</strong>: Sponsored Products, Brands, and DSP spend allocated to ASINs, not blended at account level.</li>
+            <li><strong>Returns and reimbursements</strong>: return rate by ASIN, refund fees, and inventory that never comes back sellable.</li>
+            <li><strong>Inventory</strong>: dead stock, ageing FBA units, and stockouts that cost rank and margin.</li>
+            <li><strong>Taxes and compliance</strong>: GST on fees and output tax on sales, matched to your filing workflow.</li>
+          </ul>
+
+          <h2>From spreadsheet to a number you can trust</h2>
+          <p>
+            The goal is not a one-off calculator cell but a repeatable view: net margin after all variable and allocated fixed costs, refreshed as often as you receive orders. That is where generic templates break&mdash;they cannot keep pace with catalogue changes, fee experiments, and multi-brand accounting.
+          </p>
+          <p>
+            Profitru is built for Indian sellers who need that continuity across channels: upload data once, reconcile returns and procurement alongside marketplace payouts, and see where margin leaks before you commit more inventory.
+          </p>
+
+          <div class="policy-callout">
+            <strong>Ready for your catalogue?</strong>
+            <a href="https://profitru.app/signup">Start a free trial</a> and move from theoretical margin to numbers tied to your SKUs and operations.
+          </div>
+        </article>
 
         <nav class="seo-related" aria-labelledby="related-guides">
           <h2 id="related-guides">Related profit guides</h2>
@@ -331,8 +329,8 @@
         <h2 id="seo-cta-amazon" class="cta-title">Ready to see profit on your Amazon SKUs?</h2>
         <p class="cta-desc">Connect your stack and trial Profitru on real orders&mdash;not demo spreadsheets.</p>
         <div class="cta-actions">
-          <a href="/waitlist.html" class="btn btn-primary btn-lg">Join the waitlist</a>
-          <a href="/index.html" class="btn btn-ghost btn-lg">Back to home</a>
+          <a href="https://profitru.app/signup" class="btn btn-primary btn-lg">Start free trial</a>
+          <a href="https://bookings.cloud.microsoft/book/Proiftrudemo@profitru.com/" class="btn btn-ghost btn-lg" target="_blank" rel="noopener noreferrer">Book a demo</a>
         </div>
       </div>
     </section>
@@ -349,9 +347,11 @@
         </div>
         <div class="footer-col">
           <h3>Product</h3>
-          <a href="/waitlist.html">Join waitlist</a>
+          <a href="/product/">Product</a>
+          <a href="/pricing/">Pricing</a>
+          <a href="https://profitru.app/signup">Start free trial</a>
           <a href="https://profitru.app/login">Log in</a>
-          <a href="/#demo">Demo</a>
+          <a href="https://bookings.cloud.microsoft/book/Proiftrudemo@profitru.com/" target="_blank" rel="noopener noreferrer">Book a demo</a>
         </div>
         <div class="footer-col">
           <h3>Guides</h3>
@@ -375,7 +375,7 @@
         <div class="footer-col">
           <h3>Social</h3>
           <a href="https://www.instagram.com/profitru.app/" rel="noopener noreferrer" target="_blank">Instagram</a>
-          <a href="https://www.linkedin.com/in/profitru-app-0b4692402/index.html" rel="noopener noreferrer" target="_blank">LinkedIn</a>
+          <a href="https://www.linkedin.com/in/profitru-app-0b4692402/" rel="noopener noreferrer" target="_blank">LinkedIn</a>
           <a href="https://x.com/profitruapps" rel="noopener noreferrer" target="_blank">X</a>
           <a href="https://www.threads.net/@profitru.app" rel="noopener noreferrer" target="_blank">Threads</a>
         </div>
@@ -388,8 +388,7 @@
   </footer>
 
 
-<script src="../main.js?v=profitru-2026-04-13" defer></script>
-    <script src="../nav-dropdown.js?v=2026-04-25" defer></script>
-<script src="../amazon-profit-calculator.js?v=profitru-amazon-calc-2026-04" defer></script>
+<script src="../main.js?v=profitru-2026-07-27" defer></script>
+<script src="../amazon-profit-calculator.js?v=2026-07-27-interactive" defer></script>
 </body>
 </html>

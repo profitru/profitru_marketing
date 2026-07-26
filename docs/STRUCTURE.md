@@ -35,7 +35,7 @@ Static hosts expect `index.html` at the site root. Global CSS/JS also live at th
 
 ## Shared chrome (nav / header)
 
-The mega navigation is **duplicated across HTML files**. The canonical source for bulk updates is embedded in `scripts/apply_mega_nav.py` (template string) and the feature blog generator in `scripts/render_feature_blog_series.py`. Edits to nav CTAs or structure should be applied **here first**, then re-run or merge as needed, or updated project-wide with a focused replace.
+The slim navigation is **duplicated across HTML files**. Canonical source for bulk updates: `scripts/apply_slim_nav.py`. Nav: Product · Pricing · Guides · Book a demo · Log in · **Start free trial**.
 
 ## Configuration
 

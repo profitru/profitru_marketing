@@ -1,6 +1,6 @@
 # Profitru Marketing Site
 
-Marketing website for [profitru.com](https://profitru.com). Primary calls-to-action go to the **[waitlist](waitlist.html)** (`/waitlist.html`); we notify users by email as capacity allows. **Log in** still points to [profitru.app](https://profitru.app/login) for existing accounts.
+Marketing website for [profitru.com](https://profitru.com). Primary CTA is **Start free trial** → [profitru.app/signup](https://profitru.app/signup); secondary is **Book a demo**. Waitlist remains at `/waitlist.html` for capacity-first leads. **Log in** → [profitru.app/login](https://profitru.app/login).
 
 ## Dual domain (`.in` and `.com`)
 
@@ -32,12 +32,15 @@ The static site is tuned for **Lighthouse / Core Web Vitals** without a bundler:
 
 See **[docs/STRUCTURE.md](docs/STRUCTURE.md)** for the full repository map (deploy root, duplicated nav, scripts, and what not to move without updating URLs).
 
-- `index.html` — Single-page marketing site (seller-first narrative)
-- `waitlist.html` — Private-beta waitlist form (POST `/api/waitlist` via [contact_server.py](contact_server.py))
-- `styles.css` — UI system (Syne + Manrope, dark theme, emerald accent); minified in repo
-- `nav-dropdown.css` / `nav-dropdown.js` — Header mega-menu (Product / Resources / Company dropdowns, stacked on mobile; load on every page with the main nav)
+- `index.html` — Homepage (real-profit narrative, hybrid CTAs)
+- `product/index.html` — Product modules
+- `pricing/index.html` — Basic / Pro / Enterprise
+- `waitlist.html` — Optional waitlist form (POST `/api/waitlist` via [contact_server.py](contact_server.py))
+- `styles.css` — UI system (Syne + Manrope, light/dark); minified in repo
+- `redesign-2026.css` — Slim nav + homepage/product/pricing layout
 - `main.js` — Mobile nav + FAQ accordion + footer year
-- `scripts/apply_mega_nav.py` — One-off or reference for re-applying the shared nav block across HTML (optional; nav is already in templates)
+- `scripts/apply_slim_nav.py` — Re-apply slim nav + footer Product column across HTML
+- `scripts/apply_mega_nav.py` — Legacy mega-menu helper (superseded by slim nav)
 - `logos/` — Brand assets: **`logos/profitru/profitru-logo-horizontal.png`** (header/footer logo) and **`logos/profitru/profitru-favicon.png`** (tab icon + Apple touch; referenced directly in HTML, no build step). Also `marketplace/*.svg` (Amazon, Flipkart, Shopify, WooCommerce, PrestaShop from [Simple Icons](https://simpleicons.org/) CC0; Meesho wordmark).
 
 ## Sections (UX flow)

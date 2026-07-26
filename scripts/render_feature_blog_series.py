@@ -118,42 +118,13 @@ HEAD_TOP = """<!DOCTYPE html>
         <img src="../../logos/profitru/profitru-logo-horizontal.png?v=profitru-direct-2026-04" width="900" height="400" alt="Profitru logo &mdash; Turn data into profit." class="logo-img" fetchpriority="high" decoding="async">
       </a>
       <div class="nav-end">
-        <nav class="nav-links nav-links--mega" id="nav-menu" aria-label="Primary">
-          <div class="nav-mega" data-nav-dropdown>
-            <button type="button" class="nav-mega__btn" id="nav-btn-product" aria-expanded="false" aria-controls="nav-panel-product" aria-haspopup="true">Product</button>
-            <div class="nav-mega__panel" id="nav-panel-product" role="region" aria-labelledby="nav-btn-product" hidden>
-              <div class="nav-mega__stack">
-                <a href="/#pains">Problem</a>
-                <a href="/#how">How it works</a>
-                <a href="/#features">What you get</a>
-                <a href="/#demo">See it in action</a>
-                <a href="/#faq">FAQ</a>
-                <a href="/#cta">Get started</a>
-                <a href="/#built-for">Why Profitru</a>
-              </div>
-            </div>
-          </div>
-          <div class="nav-mega" data-nav-dropdown>
-            <button type="button" class="nav-mega__btn" id="nav-btn-resources" aria-expanded="false" aria-controls="nav-panel-resources" aria-haspopup="true">Resources</button>
-            <div class="nav-mega__panel" id="nav-panel-resources" role="region" aria-labelledby="nav-btn-resources" hidden>
-              <div class="nav-mega__stack">
-                <a href="/#guides">Guides hub</a>
-                <a href="/blog/index.html">Blog</a>
-              </div>
-            </div>
-          </div>
-          <div class="nav-mega" data-nav-dropdown>
-            <button type="button" class="nav-mega__btn" id="nav-btn-company" aria-expanded="false" aria-controls="nav-panel-company" aria-haspopup="true">Company</button>
-            <div class="nav-mega__panel" id="nav-panel-company" role="region" aria-labelledby="nav-btn-company" hidden>
-              <div class="nav-mega__stack">
-                <a href="/contact.html">Contact</a>
-                <a href="/policies/index.html">Policies &amp; legal</a>
-              </div>
-            </div>
-          </div>
-          <a href="/waitlist.html" class="btn btn-primary nav-mega__cta">Join the waitlist</a>
-          <a href="https://bookings.cloud.microsoft/book/Proiftrudemo@profitru.com/" class="nav-mega__login" target="_blank" rel="noopener noreferrer">Book a demo</a>
-          <a href="https://profitru.app/login" class="nav-mega__login">Log in</a>
+        <nav class="nav-links nav-links--slim" id="nav-menu" aria-label="Primary">
+          <a href="/product/">Product</a>
+          <a href="/pricing/">Pricing</a>
+          <a href="/blog/index.html">Guides</a>
+          <a href="https://bookings.cloud.microsoft/book/Proiftrudemo@profitru.com/" class="nav-slim__link" target="_blank" rel="noopener noreferrer">Book a demo</a>
+          <a href="https://profitru.app/login" class="nav-slim__link">Log in</a>
+          <a href="https://profitru.app/signup" class="btn btn-primary nav-slim__cta">Start free trial</a>
         </nav>
         <button type="button" class="theme-toggle" data-theme-toggle="1" aria-label="Switch theme">
           <svg class="theme-toggle__moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
