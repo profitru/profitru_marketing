@@ -541,6 +541,112 @@ html[data-theme="dark"] .compare-pillar--us {
   color: var(--text, #0f172a);
 }
 
+.compare-pillar--hero {
+  max-width: 44rem;
+  margin: 0 auto;
+  order: 0;
+  transform: none;
+}
+
+@media (min-width: 900px) {
+  .compare-pillar--hero {
+    transform: none;
+  }
+}
+
+.compare-market-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 700px) {
+  .compare-market-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1100px) {
+  .compare-market-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.compare-market {
+  padding: 1.25rem 1.3rem;
+  border-radius: var(--radius, 16px);
+  border: 1px solid var(--stroke, #e2e8f0);
+  background: var(--bg-elevated, #fff);
+}
+
+.compare-market__label {
+  margin: 0 0 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent, #2563eb);
+}
+
+.compare-market h3 {
+  font-family: var(--font-display, "Syne", sans-serif);
+  font-size: 1.05rem;
+  margin: 0 0 0.45rem;
+  color: var(--text, #0f172a);
+  letter-spacing: -0.01em;
+}
+
+.compare-market > p {
+  margin: 0 0 0.85rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--text-soft, #475569);
+}
+
+.compare-market__names {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.compare-market__names li {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.28rem 0.55rem;
+  border-radius: 6px;
+  background: var(--bg-base, #f8fafc);
+  border: 1px solid var(--stroke, #e2e8f0);
+  color: var(--text, #0f172a);
+}
+
+html[data-theme="dark"] .compare-market__names li {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.module-grid--four {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 700px) {
+  .module-grid--four {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1100px) {
+  .module-grid--four {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.compare-table {
+  min-width: 920px;
+}
+
 .compare-edge-grid {
   display: grid;
   gap: 0.75rem;
