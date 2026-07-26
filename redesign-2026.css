@@ -452,7 +452,106 @@ html[data-theme="dark"] .nav-links--slim > a:focus-visible {
 .compare-pillar--us {
   border-color: var(--accent, #2563eb);
   box-shadow: 0 0 0 1px var(--accent, #2563eb);
+  order: -1;
 }
+
+@media (min-width: 900px) {
+  .compare-pillar--us {
+    order: 0;
+  }
+  .compare-pillars {
+    grid-template-columns: 1.15fr 1fr 1fr;
+  }
+}
+
+.compare-pillar__badge {
+  display: inline-block;
+  margin: 0 0 0.65rem;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--accent, #2563eb);
+  border-radius: 6px;
+}
+
+.compare-edge-grid {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 600px) {
+  .compare-edge-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1000px) {
+  .compare-edge-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.compare-edge {
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius-sm, 10px);
+  border: 1px solid rgba(37, 99, 235, 0.28);
+  background: rgba(37, 99, 235, 0.06);
+}
+
+.compare-edge strong {
+  display: block;
+  font-family: var(--font-display, "Syne", sans-serif);
+  font-size: 0.98rem;
+  color: var(--text, #0f172a);
+  margin-bottom: 0.2rem;
+}
+
+.compare-edge span {
+  font-size: 0.88rem;
+  color: var(--text-soft, #475569);
+  line-height: 1.4;
+}
+
+.cmp-yes,
+.cmp-partial,
+.cmp-no {
+  display: inline-block;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.cmp-yes::before {
+  content: "✓ ";
+  color: #059669;
+  font-weight: 800;
+}
+
+.cmp-partial::before {
+  content: "○ ";
+  color: #d97706;
+  font-weight: 800;
+}
+
+.cmp-no::before {
+  content: "— ";
+  color: #94a3b8;
+  font-weight: 800;
+}
+
+.compare-table--emphasis .compare-table__us {
+  min-width: 11rem;
+}
+
+.compare-table--emphasis thead .compare-table__us {
+  background: rgba(37, 99, 235, 0.12);
+  font-size: 0.9rem;
+}
+
 
 .compare-pillar__who {
   margin: 0 0 0.35rem;
