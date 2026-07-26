@@ -19,6 +19,12 @@
     <lastmod>2026-07-27</lastmod>
   </url>
   <url>
+    <loc>https://profitru.com/compare/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <lastmod>2026-07-27</lastmod>
+  </url>
+  <url>
     <loc>https://profitru.com/contact.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
