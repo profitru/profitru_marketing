@@ -120,7 +120,7 @@ HEAD_TOP = """<!DOCTYPE html>
       <div class="nav-end">
         <nav class="nav-links nav-links--slim" id="nav-menu" aria-label="Primary">
           <a href="/product/">Product</a>
-          <a href="/pricing/">Pricing</a>
+          <a href="/compare/">Compare</a>
           <a href="/blog/index.html">Guides</a>
           <a href="https://bookings.cloud.microsoft/book/Proiftrudemo@profitru.com/" class="nav-slim__link" target="_blank" rel="noopener noreferrer">Book a demo</a>
           <a href="https://profitru.app/login" class="nav-slim__link">Log in</a>
