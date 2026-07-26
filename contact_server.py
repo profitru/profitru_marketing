@@ -507,6 +507,12 @@ def static_or_html(path: str):
     candidate = ROOT / path
     if candidate.is_file():
         return send_from_directory(ROOT, path)
+    # Directory indexes: /product/ and /product → product/index.html
+    dir_candidate = ROOT / path.rstrip("/")
+    if dir_candidate.is_dir():
+        index_file = dir_candidate / "index.html"
+        if index_file.is_file():
+            return send_from_directory(ROOT, str(index_file.relative_to(ROOT)))
     return jsonify({"error": "Not found"}), 404
 
 
