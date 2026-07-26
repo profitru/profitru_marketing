@@ -16,7 +16,6 @@ LINKEDIN_OK = "https://www.linkedin.com/in/profitru-app-0b4692402/"
 
 NAV = f"""        <nav class="nav-links nav-links--slim" id="nav-menu" aria-label="Primary">
           <a href="/product/">Product</a>
-          <a href="/pricing/">Pricing</a>
           <a href="/compare/">Compare</a>
           <a href="/blog/index.html">Guides</a>
           <a href="{DEMO}" class="nav-slim__link" target="_blank" rel="noopener noreferrer">Book a demo</a>
@@ -35,7 +34,6 @@ FOOTER_PRODUCT_RE = re.compile(
 )
 
 FOOTER_PRODUCT = f"""<a href="/product/">Product</a>
-          <a href="/pricing/">Pricing</a>
           <a href="/compare/">Compare</a>
           <a href="{TRIAL}">Start free trial</a>
           <a href="{LOGIN}">Log in</a>
