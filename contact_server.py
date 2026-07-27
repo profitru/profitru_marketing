@@ -495,6 +495,46 @@ def api_health():
     )
 
 
+# Never publish secrets, VCS, backend source, or private data via the static catch-all.
+_BLOCKED_PREFIXES = (
+    ".",
+    "data/",
+    "deploy/",
+    "tests/",
+    "docs/",
+    "scripts/",
+    "__pycache__/",
+)
+_BLOCKED_NAMES = frozenset(
+    {
+        "contact_server.py",
+        "form_security.py",
+        "serve.py",
+        "requirements.txt",
+        ".env",
+        ".gitignore",
+    }
+)
+_BLOCKED_SUFFIXES = (".env", ".bak", ".pem", ".key", ".log", ".sqlite", ".sqlite3", ".pyc")
+
+
+def _is_blocked_public_path(path: str) -> bool:
+    normalized = path.replace("\\", "/").lstrip("/")
+    if not normalized or ".." in normalized.split("/"):
+        return True
+    lower = normalized.lower()
+    name = Path(normalized).name.lower()
+    if name in _BLOCKED_NAMES or lower in _BLOCKED_NAMES:
+        return True
+    if any(lower.startswith(prefix) for prefix in _BLOCKED_PREFIXES):
+        return True
+    if any(lower.endswith(suffix) for suffix in _BLOCKED_SUFFIXES):
+        return True
+    if name.startswith("."):
+        return True
+    return False
+
+
 @app.route("/")
 def index():
     return send_from_directory(ROOT, "index.html")
@@ -504,7 +544,13 @@ def index():
 def static_or_html(path: str):
     if path.startswith("api/") or path == "api":
         return jsonify({"error": "Not found"}), 404
-    candidate = ROOT / path
+    if _is_blocked_public_path(path):
+        return jsonify({"error": "Not found"}), 404
+    candidate = (ROOT / path).resolve()
+    try:
+        candidate.relative_to(ROOT.resolve())
+    except ValueError:
+        return jsonify({"error": "Not found"}), 404
     if candidate.is_file():
         return send_from_directory(ROOT, path)
     # Directory indexes: /product/ and /product → product/index.html

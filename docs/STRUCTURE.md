@@ -20,6 +20,8 @@ Upload (or sync) **the whole tree** that serves static files, not only `index.ht
 
 Backend for forms (optional, not static hosting alone): `contact_server.py` and env from `.env.example`.
 
+**Do not deploy** `.env`, `.git/`, `contact_server.py`, `data/submissions/`, or `deploy/` into the public document root. Use [deploy/rsync-exclude.txt](../deploy/rsync-exclude.txt). Keep production secrets at `/home/profitru/profitru-marketing/.env`.
+
 ## Root directory (why it looks �flat�)
 
 Static hosts expect `index.html` at the site root. Global CSS/JS also live at the root for **simple relative URLs** from nested pages (`../../styles.css` from `blog/...`). That is intentional; see [scripts/README.md](../scripts/README.md) for automation that touches many files.

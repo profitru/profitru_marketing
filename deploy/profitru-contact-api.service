@@ -6,9 +6,10 @@ After=network.target
 Type=simple
 User=www-data
 Group=www-data
-WorkingDirectory=/var/www/profitru-marketing
-EnvironmentFile=/var/www/profitru-marketing/.env
-ExecStart=/var/www/profitru-marketing/.venv/bin/gunicorn -w 2 -b 127.0.0.1:8080 contact_server:app
+# Keep code + secrets OUTSIDE the nginx document root.
+WorkingDirectory=/home/profitru/profitru-marketing
+EnvironmentFile=/home/profitru/profitru-marketing/.env
+ExecStart=/home/profitru/profitru-marketing/.venv/bin/gunicorn -w 2 -b 127.0.0.1:8080 contact_server:app
 Restart=on-failure
 RestartSec=5
 

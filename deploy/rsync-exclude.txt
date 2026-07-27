@@ -1,0 +1,27 @@
+# Exclude from public web root syncs (rsync --exclude-from=deploy/rsync-exclude.txt)
+.env
+.env.*
+!.env.example
+.git/
+.gitignore
+.DS_Store
+.venv/
+.venv-*/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+*.log
+*.pem
+*.key
+*.sqlite3
+data/submissions/
+deploy/
+tests/
+docs/
+scripts/
+contact_server.py
+form_security.py
+serve.py
+requirements.txt
+README.md
+.env.example

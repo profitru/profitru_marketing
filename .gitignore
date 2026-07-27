@@ -2,7 +2,8 @@
 .venv-fav/
 .venv/
 .env
-.env.example
+.env.*
+!.env.example
 
 __pycache__/
 *.py[cod]

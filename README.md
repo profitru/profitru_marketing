@@ -57,11 +57,29 @@ See **[docs/STRUCTURE.md](docs/STRUCTURE.md)** for the full repository map (depl
 
 ## Deploy to profitru.com
 
+### Security: never publish `.env` or `.git`
+
+The public document root must **not** contain `.env`, `.git/`, Python backend files, or `data/submissions/`. Scanners hit `/.env` constantly — if those files are under the web root, secrets are stolen.
+
+**If `https://profitru.com/.env` returns 200, treat it as a breach:**
+
+1. **Cloudflare (fastest):** Security → WAF → Custom rules → Block URI Path containing `.env` or starting with `/.git`.
+2. **On the server:** delete or move secrets out of the nginx root, then reload nginx with the deny rules in [deploy/nginx.profitru-marketing.conf](deploy/nginx.profitru-marketing.conf).
+3. **Rotate immediately:** MSG91/SMTP password, Cloudflare Turnstile secret key (and site key if needed). Assume the old values are compromised.
+4. Sync static files with [deploy/rsync-exclude.txt](deploy/rsync-exclude.txt). Keep `.env` only at `/home/profitru/profitru-marketing/.env` for gunicorn — not under `/var/www/...`.
+
+```bash
+# Example safe sync (from your laptop)
+rsync -avz --delete \
+  --exclude-from=deploy/rsync-exclude.txt \
+  ./ user@server:/var/www/profitru-marketing/
+```
+
 ### Option A: AWS S3 + CloudFront (recommended)
 
 1. Create S3 bucket (e.g. `profitru-marketing`)
 2. Enable static website hosting (set **Index document** to `index.html` so `blog/` resolves to `blog/index.html`)
-3. Upload the **full** site tree: `index.html`, `styles.css`, `main.js`, `blog/**`, `amazon-profit-calculator/**`, other calculator folders, `policies/**`, `logos/**`, etc. Uploading only the homepage files will 404 every subdirectory URL.
+3. Upload the **full** site tree: `index.html`, `styles.css`, `main.js`, `blog/**`, `amazon-profit-calculator/**`, other calculator folders, `policies/**`, `logos/**`, etc. Uploading only the homepage files will 404 every subdirectory URL. **Do not upload `.env` or `.git`.**
 4. Create CloudFront distribution pointing to S3
 5. Add custom domain `profitru.com` in CloudFront
 6. Point DNS A/CNAME for `profitru.com` to CloudFront
@@ -72,27 +90,29 @@ If you already have Lightsail for the app:
 
 ```bash
 # On your Lightsail instance
-sudo mkdir -p /var/www/profitru.com
-# Copy the *entire* repo root into the web root (not only index.html):
-#   index.html, styles.css, main.js, robots.txt, sitemap.xml,
-#   blog/, amazon-profit-calculator/, flipkart-profit-calculator/, …, logos/, policies/
+sudo mkdir -p /var/www/profitru-marketing
+# Sync static HTML/CSS/JS/assets only (see deploy/rsync-exclude.txt).
+# Never copy .env or .git into this folder.
 ```
 
-Use a **multi-page static** `location` block (this site is **not** a single-page app—do **not** fall back to `/index.html` for every missing URL):
+Use a **multi-page static** `location` block (this site is **not** a single-page app—do **not** fall back to `/index.html` for every missing URL). Always deny hidden/secret paths:
 
 ```nginx
 server {
     listen 80;
     server_name profitru.com www.profitru.com;
-    root /var/www/profitru.com;
+    root /var/www/profitru-marketing;
     index index.html;
+
+    location ~ /\. { deny all; return 404; }
+
     location / {
         try_files $uri $uri/ =404;
     }
 }
 ```
 
-A fuller example (TLS + asset caching + `.in` → `.com` redirect) lives in **[deploy/nginx.profitru-marketing.conf](deploy/nginx.profitru-marketing.conf)**.
+A fuller example (TLS + asset caching + secret denies + `.in` → `.com` redirect) lives in **[deploy/nginx.profitru-marketing.conf](deploy/nginx.profitru-marketing.conf)**.
 
 **If `https://profitru.in/blog/` or `/amazon-profit-calculator/` returns 404 but localhost works:** the `.in` host usually has an **incomplete upload** (only top-level files) or **nginx `root`** points at the wrong folder. Re-sync the full tree or **301 redirect** `profitru.in` → `profitru.com` so both hostnames serve the same deployment.
 
@@ -189,10 +209,10 @@ If the marketing HTML is served from another host (CDN, S3), set the API base UR
 
 ### Production deployment
 
-1. Upload the full static site to `/var/www/profitru-marketing` (not just `index.html`).
-2. Copy `.env` with valid `SMTP_*` values to the server.
+1. Upload the full **static** site to `/var/www/profitru-marketing` (not just `index.html`), using [deploy/rsync-exclude.txt](deploy/rsync-exclude.txt) so `.env` / `.git` / Python API files are not published.
+2. Copy `.env` with valid `SMTP_*` values to **`/home/profitru/profitru-marketing/.env`** (API app directory — **not** the nginx document root).
 3. Install deps and run the API with gunicorn (see [deploy/profitru-marketing.service](deploy/profitru-marketing.service) — on the live server this unit is named `profitru-marketing.service`).
-4. Point nginx at the static root and proxy `/api/` to `127.0.0.1:8080` (see [deploy/nginx.profitru-marketing.conf](deploy/nginx.profitru-marketing.conf)).
+4. Point nginx at the static root and proxy `/api/` to `127.0.0.1:8080` (see [deploy/nginx.profitru-marketing.conf](deploy/nginx.profitru-marketing.conf)). Confirm `curl -I https://profitru.com/.env` is **404**.
 5. Check `GET /api/health` returns `{"ok": true, ...}`.
 
 If SMTP is misconfigured, submissions are still saved under `data/submissions/*.jsonl` and the form returns success (`{"ok": true, "queued": true}`). Review those files and fix SMTP so email notifications resume.
