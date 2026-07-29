@@ -117,7 +117,7 @@ def test_rate_limit(monkeypatch):
     assert silent is False
 
 
-def test_form_nonce_is_one_time(monkeypatch):
+def test_form_nonce_is_one_time(monkeypatch, tmp_path):
     monkeypatch.setenv("FORM_REQUIRE_TURNSTILE", "false")
     monkeypatch.setenv("FORM_REQUIRE_BROWSER_HEADERS", "false")
     monkeypatch.setenv("FORM_REQUIRE_NONCE", "true")
@@ -125,6 +125,7 @@ def test_form_nonce_is_one_time(monkeypatch):
     monkeypatch.setenv("FORM_GLOBAL_RATE_LIMIT_MAX", "100")
     monkeypatch.setenv("FORM_RATE_LIMIT_MAX_CONTACT", "10")
     monkeypatch.setenv("TURNSTILE_SECRET_KEY", "test-nonce-secret")
+    monkeypatch.setenv("FORM_FALLBACK_DIR", str(tmp_path))
     fs._hits.clear()
     nonce = fs.issue_form_nonce()
     data = {"form_started_at": int(time.time() * 1000) - 6000, "form_nonce": nonce}
@@ -138,6 +139,62 @@ def test_form_nonce_is_one_time(monkeypatch):
         text_parts=("msg",),
     )
     assert err is None and silent is False
+    err2, silent2 = fs.evaluate_submission(
+        kind="contact",
+        ip="10.0.0.2",
+        headers=_headers(),
+        data=data,
+        email="seller@example.com",
+        subject="Hello again",
+        text_parts=("msg",),
+    )
+    assert err2 is None and silent2 is True
+
+
+def test_origin_substring_bypass_rejected(monkeypatch):
+    _disable_extra_guards(monkeypatch)
+    for origin in (
+        "https://evilprofitru.com",
+        "https://not-profitru.com",
+        "https://profitru.com.evil.com",
+        "https://attacker.example/?x=profitru.com",
+    ):
+        err, silent = fs.evaluate_submission(
+            kind="contact",
+            ip="10.0.0.9",
+            headers=_headers(origin),
+            data={"form_started_at": int(time.time() * 1000) - 6000},
+            email="seller@example.com",
+            subject="Hello",
+            text_parts=("msg",),
+        )
+        assert err is None and silent is True, origin
+
+
+def test_client_ip_prefers_x_real_ip():
+    assert (
+        fs.client_ip({"X-Forwarded-For": "1.2.3.4, 9.9.9.9", "X-Real-IP": "9.9.9.9"}, "10.0.0.1")
+        == "9.9.9.9"
+    )
+    assert fs.client_ip({"X-Forwarded-For": "1.2.3.4, 5.5.5.5"}, None) == "5.5.5.5"
+
+
+def test_turnstile_required_fails_closed_without_secret(monkeypatch):
+    monkeypatch.setenv("FORM_REQUIRE_TURNSTILE", "true")
+    monkeypatch.delenv("TURNSTILE_SECRET_KEY", raising=False)
+    monkeypatch.setenv("FORM_REQUIRE_NONCE", "false")
+    monkeypatch.setenv("FORM_REQUIRE_BROWSER_HEADERS", "false")
+    err, silent = fs.evaluate_submission(
+        kind="contact",
+        ip="8.8.4.4",
+        headers=_headers(),
+        data={"form_started_at": int(time.time() * 1000) - 6000},
+        email="seller@example.com",
+        subject="Hello",
+        text_parts=("msg",),
+    )
+    assert err is not None and "unavailable" in err.lower()
+    assert silent is False
 
 
 def test_form_nonce_rejects_invalid(monkeypatch):
@@ -147,6 +204,7 @@ def test_form_nonce_rejects_invalid(monkeypatch):
     monkeypatch.setenv("FORM_MIN_FILL_SECONDS", "3")
     monkeypatch.setenv("FORM_GLOBAL_RATE_LIMIT_MAX", "100")
     monkeypatch.setenv("FORM_RATE_LIMIT_MAX_CONTACT", "10")
+    monkeypatch.setenv("TURNSTILE_SECRET_KEY", "test-nonce-secret")
     fs._hits.clear()
     err, silent = fs.evaluate_submission(
         kind="contact",

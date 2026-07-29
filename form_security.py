@@ -65,11 +65,15 @@ _DISPOSABLE_DOMAINS = frozenset(
     }
 )
 
-_ALLOWED_ORIGIN_SUFFIXES = (
-    "profitru.com",
-    "profitru.in",
-    "localhost",
-    "127.0.0.1",
+_ALLOWED_ORIGIN_HOSTS = frozenset(
+    {
+        "profitru.com",
+        "www.profitru.com",
+        "profitru.in",
+        "www.profitru.in",
+        "localhost",
+        "127.0.0.1",
+    }
 )
 
 _ALLOWED_TURNSTILE_HOSTNAMES = (
@@ -83,48 +87,7 @@ _ALLOWED_TURNSTILE_HOSTNAMES = (
 
 _lock = threading.Lock()
 _hits: dict[str, deque[float]] = defaultdict(deque)
-
-
-def _nonce_secret() -> bytes:
-    for name in ("FORM_NONCE_SECRET", "TURNSTILE_SECRET_KEY"):
-        raw = os.environ.get(name, "").strip()
-        if raw:
-            return raw.encode()
-    return b"profitru-marketing-nonce-dev"
-
-
-def _turnstile_store_path() -> Path:
-    configured = os.environ.get("FORM_FALLBACK_DIR", "").strip()
-    if configured:
-        base = Path(configured).expanduser()
-    else:
-        base = Path(__file__).resolve().parent / "data" / "submissions"
-    base.mkdir(parents=True, exist_ok=True)
-    return base / ".turnstile_used.json"
-
-
-def _turnstile_token_already_used(token_key: str, ttl: int) -> bool:
-    """Cross-process Turnstile replay guard (works with multiple gunicorn workers)."""
-    digest = hashlib.sha256(token_key.encode()).hexdigest()
-    now = time.time()
-    path = _turnstile_store_path()
-    with _lock:
-        try:
-            if path.exists():
-                store = json.loads(path.read_text(encoding="utf-8"))
-            else:
-                store = {}
-        except (OSError, json.JSONDecodeError):
-            store = {}
-        store = {k: v for k, v in store.items() if float(v) >= now}
-        if digest in store:
-            return True
-        store[digest] = now + ttl
-        try:
-            path.write_text(json.dumps(store), encoding="utf-8")
-        except OSError as exc:
-            log.warning("turnstile replay store write failed: %s", exc)
-        return False
+_DEV_NONCE_SECRET = b"profitru-marketing-nonce-dev"
 
 
 def _env_int(name: str, default: int) -> int:
@@ -160,6 +123,57 @@ def _env_bool(name: str, default: bool) -> bool:
     return env_bool(name, default)
 
 
+def _nonce_secret() -> bytes | None:
+    for name in ("FORM_NONCE_SECRET", "TURNSTILE_SECRET_KEY"):
+        raw = os.environ.get(name, "").strip()
+        if raw:
+            return raw.encode()
+    # Local/dev only — production must set FORM_NONCE_SECRET or TURNSTILE_SECRET_KEY.
+    if os.environ.get("FLASK_ENV", "").strip().lower() == "development" or _env_bool(
+        "FORM_ALLOW_DEV_NONCE_SECRET", False
+    ):
+        return _DEV_NONCE_SECRET
+    return None
+
+
+def _replay_store_path(name: str) -> Path:
+    configured = os.environ.get("FORM_FALLBACK_DIR", "").strip()
+    if configured:
+        base = Path(configured).expanduser()
+    else:
+        base = Path(__file__).resolve().parent / "data" / "submissions"
+    base.mkdir(parents=True, exist_ok=True)
+    return base / name
+
+
+def _mark_token_used(store_name: str, token_key: str, ttl: int) -> bool:
+    """Return True if token was already used; otherwise record it. File-backed for multi-worker."""
+    digest = hashlib.sha256(token_key.encode()).hexdigest()
+    now = time.time()
+    path = _replay_store_path(store_name)
+    with _lock:
+        try:
+            if path.exists():
+                store = json.loads(path.read_text(encoding="utf-8"))
+            else:
+                store = {}
+        except (OSError, json.JSONDecodeError):
+            store = {}
+        store = {k: v for k, v in store.items() if float(v) >= now}
+        if digest in store:
+            return True
+        store[digest] = now + ttl
+        try:
+            path.write_text(json.dumps(store), encoding="utf-8")
+        except OSError as exc:
+            log.warning("replay store write failed (%s): %s", store_name, exc)
+        return False
+
+
+def _turnstile_token_already_used(token_key: str, ttl: int) -> bool:
+    return _mark_token_used(".turnstile_used.json", token_key, ttl)
+
+
 def forms_enabled() -> bool:
     return _env_bool("FORM_SUBMISSIONS_ENABLED", True)
 
@@ -173,10 +187,8 @@ def turnstile_secret_configured() -> bool:
 
 
 def turnstile_required() -> bool:
-    """Require a valid Turnstile token before sending mail (default: true)."""
-    if not _env_bool("FORM_REQUIRE_TURNSTILE", True):
-        return False
-    return turnstile_secret_configured()
+    """Whether Turnstile is required (independent of whether keys are configured)."""
+    return _env_bool("FORM_REQUIRE_TURNSTILE", True)
 
 
 def form_nonce_required() -> bool:
@@ -184,18 +196,27 @@ def form_nonce_required() -> bool:
 
 
 def issue_form_nonce() -> str:
-    """Signed nonce valid on any gunicorn worker (no in-memory store)."""
+    """Signed one-time nonce valid on any gunicorn worker."""
+    secret = _nonce_secret()
+    if secret is None:
+        raise RuntimeError(
+            "FORM_NONCE_SECRET or TURNSTILE_SECRET_KEY must be set to issue form nonces"
+        )
     ttl = _env_int("FORM_NONCE_TTL_SEC", 900)
     expires = int(time.time()) + ttl
     rnd = secrets.token_urlsafe(16)
     payload = f"{expires}.{rnd}"
-    sig = hmac.new(_nonce_secret(), payload.encode(), hashlib.sha256).hexdigest()
+    sig = hmac.new(secret, payload.encode(), hashlib.sha256).hexdigest()
     return f"{payload}.{sig}"
 
 
 def consume_form_nonce(raw: str) -> bool:
     if not form_nonce_required():
         return True
+    secret = _nonce_secret()
+    if secret is None:
+        log.error("form nonce required but no signing secret configured")
+        return False
     token = (raw or "").strip()
     if not token or token.count(".") != 2:
         log.info("form nonce missing or malformed")
@@ -210,27 +231,51 @@ def consume_form_nonce(raw: str) -> bool:
         log.info("form nonce expired")
         return False
     payload = f"{expires_s}.{rnd}"
-    expected = hmac.new(_nonce_secret(), payload.encode(), hashlib.sha256).hexdigest()
+    expected = hmac.new(secret, payload.encode(), hashlib.sha256).hexdigest()
     if not hmac.compare_digest(sig, expected):
         log.info("form nonce signature invalid")
+        return False
+    ttl = max(1, expires - int(time.time()) + 60)
+    if _mark_token_used(".nonce_used.json", token, ttl):
+        log.info("form nonce replay blocked")
         return False
     return True
 
 
 def client_ip(headers: dict[str, str], remote_addr: str | None) -> str:
-    forwarded = (headers.get("X-Forwarded-For") or headers.get("X-Real-IP") or "").strip()
+    """Prefer nginx X-Real-IP. Never trust the leftmost client-supplied X-Forwarded-For hop."""
+    real_ip = (headers.get("X-Real-IP") or "").strip()
+    if real_ip and "," not in real_ip:
+        return real_ip
+    # Fallback: rightmost XFF hop is typically appended by the trusted proxy.
+    forwarded = (headers.get("X-Forwarded-For") or "").strip()
     if forwarded:
-        return forwarded.split(",")[0].strip()
+        parts = [p.strip() for p in forwarded.split(",") if p.strip()]
+        if parts:
+            return parts[-1]
     return (remote_addr or "unknown").strip() or "unknown"
+
+
+def _hostname_from_origin_or_referer(value: str) -> str | None:
+    raw = (value or "").strip()
+    if not raw:
+        return None
+    try:
+        parsed = urllib.parse.urlparse(raw if "://" in raw else f"https://{raw}")
+    except ValueError:
+        return None
+    host = (parsed.hostname or "").lower().strip()
+    return host or None
 
 
 def origin_allowed(headers: dict[str, str]) -> bool:
     if not _env_bool("FORM_REQUIRE_ALLOWED_ORIGIN", True):
         return True
-    origin = (headers.get("Origin") or headers.get("Referer") or "").strip().lower()
-    if not origin:
-        return False
-    return any(suffix in origin for suffix in _ALLOWED_ORIGIN_SUFFIXES)
+    for header in ("Origin", "Referer"):
+        host = _hostname_from_origin_or_referer(headers.get(header) or "")
+        if host and host in _ALLOWED_ORIGIN_HOSTS:
+            return True
+    return False
 
 
 def browser_submission_ok(headers: dict[str, str]) -> bool:
@@ -271,8 +316,10 @@ def global_rate_limit_exceeded(ip: str) -> bool:
 
 def rate_limit_exceeded(kind: str, ip: str) -> bool:
     window = _env_int("FORM_RATE_LIMIT_WINDOW_SEC", 3600)
-    max_hits = _env_int("FORM_RATE_LIMIT_MAX_CONTACT", 1) if kind == "contact" else _env_int(
-        "FORM_RATE_LIMIT_MAX_WAITLIST", 1
+    max_hits = (
+        _env_int("FORM_RATE_LIMIT_MAX_CONTACT", 1)
+        if kind == "contact"
+        else _env_int("FORM_RATE_LIMIT_MAX_WAITLIST", 1)
     )
     return _rate_limit_hit(f"{kind}:{ip}", window, max_hits)
 
@@ -352,7 +399,7 @@ def verify_turnstile(token: str, remote_ip: str | None, *, expected_action: str 
         return False
     if expected_action:
         action = str(body.get("action") or "").strip()
-        if action and action != expected_action:
+        if action != expected_action:
             log.info("turnstile action rejected: got %r expected %r", action, expected_action)
             return False
     token_key = token.strip()
@@ -382,6 +429,10 @@ def evaluate_submission(
 
     if turnstile_required() and not turnstile_secret_configured():
         log.error("FORM_REQUIRE_TURNSTILE is on but TURNSTILE_SECRET_KEY is missing")
+        return ("Form is temporarily unavailable. Please email support@profitru.com.", False)
+
+    if form_nonce_required() and _nonce_secret() is None:
+        log.error("FORM_REQUIRE_NONCE is on but no signing secret is configured")
         return ("Form is temporarily unavailable. Please email support@profitru.com.", False)
 
     if not origin_allowed(headers):

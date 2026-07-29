@@ -17,7 +17,7 @@ LINKEDIN_OK = "https://www.linkedin.com/in/profitru-app-0b4692402/"
 NAV = f"""        <nav class="nav-links nav-links--slim" id="nav-menu" aria-label="Primary">
           <a href="/product/">Product</a>
           <a href="/compare/">Compare</a>
-          <a href="/blog/index.html">Guides</a>
+          <a href="/blog/">Guides</a>
           <a href="{DEMO}" class="nav-slim__link" target="_blank" rel="noopener noreferrer">Book a demo</a>
           <a href="{LOGIN}" class="nav-slim__link">Log in</a>
           <a href="{TRIAL}" class="btn btn-primary nav-slim__cta">Start free trial</a>

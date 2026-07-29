@@ -24,7 +24,7 @@ from datetime import datetime, timezone
 from email.message import EmailMessage
 from pathlib import Path
 from dotenv import load_dotenv
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, redirect, request, send_from_directory
 
 from form_security import (
     client_ip,
@@ -45,6 +45,7 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 log = logging.getLogger(__name__)
 
 app = Flask(__name__)
+app.config["MAX_CONTENT_LENGTH"] = 64 * 1024
 
 _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
@@ -302,6 +303,17 @@ def _submission_guard(kind: str, data: dict, *, email: str, subject: str = "", t
     return None
 
 
+@app.after_request
+def _security_headers(response):
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers.setdefault(
+        "Permissions-Policy", "camera=(), microphone=(), geolocation=()"
+    )
+    return response
+
+
 @app.route("/api/contact", methods=["POST"])
 def api_contact():
     data = request.get_json(silent=True)
@@ -319,6 +331,17 @@ def api_contact():
     subject = str(data.get("subject") or "").strip()
     message = str(data.get("message") or "").strip()
 
+    # Security guards before detailed field errors (limits probing without Turnstile).
+    blocked = _submission_guard(
+        "contact",
+        data,
+        email=email or "invalid@example.com",
+        subject=subject,
+        text_parts=(message, name),
+    )
+    if blocked is not None:
+        return blocked
+
     if not name or len(name) > 200:
         return jsonify({"error": "Please enter your name."}), 400
     if not _valid_email(email):
@@ -329,10 +352,6 @@ def api_contact():
         return jsonify({"error": "Please enter a short subject or question line."}), 400
     if not message or len(message) > 10000:
         return jsonify({"error": "Please enter a message (up to about 10,000 characters)."}), 400
-
-    blocked = _submission_guard("contact", data, email=email, subject=subject, text_parts=(message, name))
-    if blocked is not None:
-        return blocked
 
     try:
         _send_contact_email(
@@ -379,6 +398,15 @@ def api_waitlist():
     marketplaces = str(data.get("marketplaces") or "").strip()
     message = str(data.get("message") or "").strip()
 
+    blocked = _submission_guard(
+        "waitlist",
+        data,
+        email=email or "invalid@example.com",
+        text_parts=(message, name, company, role, marketplaces),
+    )
+    if blocked is not None:
+        return blocked
+
     if not name or len(name) > 200:
         return jsonify({"error": "Please enter your name."}), 400
     if not _valid_email(email):
@@ -407,15 +435,6 @@ def api_waitlist():
             ),
             400,
         )
-
-    blocked = _submission_guard(
-        "waitlist",
-        data,
-        email=email,
-        text_parts=(message, name, company, role, marketplaces),
-    )
-    if blocked is not None:
-        return blocked
 
     try:
         _send_waitlist_emails(
@@ -470,27 +489,24 @@ def api_form_config():
         "contact_send_ack": _email_routing_info()["contact_send_ack"],
     }
     if form_nonce_required():
-        payload["form_nonce"] = issue_form_nonce()
+        try:
+            payload["form_nonce"] = issue_form_nonce()
+        except RuntimeError:
+            log.error("form-config: cannot issue nonce — signing secret missing")
+            return jsonify({"error": "Form is temporarily unavailable."}), 503
     return jsonify(payload)
 
 
 @app.route("/api/health", methods=["GET"])
 def api_health():
-    smtp_host = os.environ.get("SMTP_HOST", "").strip()
-    fallback = _fallback_dir()
+    # Public health stays minimal — no mailbox paths or SMTP identity.
     return jsonify(
         {
             "ok": True,
-            "smtp_configured": bool(smtp_host),
             "forms_enabled": forms_enabled(),
-            "turnstile_required": turnstile_required(),
             "turnstile_configured": turnstile_secret_configured() and bool(turnstile_site_key()),
+            "turnstile_required": turnstile_required(),
             "form_nonce_required": form_nonce_required(),
-            "fallback_dir": str(fallback),
-            "fallback_writable": fallback.exists() and os.access(fallback, os.W_OK)
-            if fallback.exists()
-            else True,
-            **_email_routing_info(),
         }
     )
 
@@ -511,6 +527,7 @@ _BLOCKED_NAMES = frozenset(
         "form_security.py",
         "serve.py",
         "requirements.txt",
+        "readme.md",
         ".env",
         ".gitignore",
     }
@@ -544,6 +561,13 @@ def index():
 def static_or_html(path: str):
     if path.startswith("api/") or path == "api":
         return jsonify({"error": "Not found"}), 404
+    # Canonicalize .../index.html → directory URL (SEO)
+    if path == "index.html":
+        return redirect("/", code=301)
+    if path.endswith("/index.html"):
+        return redirect("/" + path[: -len("index.html")], code=301)
+    if path.endswith("index.html") and "/" not in path:
+        return redirect("/", code=301)
     if _is_blocked_public_path(path):
         return jsonify({"error": "Not found"}), 404
     candidate = (ROOT / path).resolve()
