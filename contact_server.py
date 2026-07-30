@@ -303,6 +303,23 @@ def _submission_guard(kind: str, data: dict, *, email: str, subject: str = "", t
     return None
 
 
+_CSP = (
+    "default-src 'self'; "
+    "base-uri 'self'; "
+    "object-src 'none'; "
+    "frame-ancestors 'self'; "
+    "form-action 'self'; "
+    "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://challenges.cloudflare.com; "
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com; "
+    "font-src 'self' https://fonts.gstatic.com data:; "
+    "img-src 'self' data: https:; "
+    "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com "
+    "https://*.analytics.google.com https://www.googletagmanager.com https://challenges.cloudflare.com; "
+    "frame-src https://challenges.cloudflare.com; "
+    "upgrade-insecure-requests"
+)
+
+
 @app.after_request
 def _security_headers(response):
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
@@ -311,6 +328,13 @@ def _security_headers(response):
     response.headers.setdefault(
         "Permissions-Policy", "camera=(), microphone=(), geolocation=()"
     )
+    # Avoid pinning localhost HTTP to HTTPS during local `python contact_server.py`.
+    forwarded_proto = (request.headers.get("X-Forwarded-Proto") or "").split(",")[0].strip()
+    if request.is_secure or forwarded_proto.lower() == "https":
+        response.headers.setdefault(
+            "Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload"
+        )
+    response.headers.setdefault("Content-Security-Policy", _CSP)
     return response
 
 
