@@ -54,26 +54,26 @@
 }
 .nav-mega__btn:hover,
 .nav-mega__btn:focus-visible {
-  color: var(--text, #0f172a);
-  background: var(--accent-dim, rgba(37, 99, 235, 0.12));
+  color: var(--text, #050f40);
+  background: var(--accent-dim, rgba(0, 71, 225, 0.12));
   outline: none;
 }
 .nav-mega__btn[aria-expanded="true"] {
-  color: var(--accent-deep, #1d4ed8);
-  background: var(--accent-dim, rgba(37, 99, 235, 0.12));
+  color: var(--accent-deep, #0030b8);
+  background: var(--accent-dim, rgba(0, 71, 225, 0.12));
 }
 
 html[data-theme="dark"] .nav-mega__btn {
-  color: #475569;
+  color: var(--text-muted, #94a3b8);
 }
 html[data-theme="dark"] .nav-mega__btn:hover,
 html[data-theme="dark"] .nav-mega__btn:focus-visible {
-  color: #0f172a;
-  background: rgba(37, 99, 235, 0.12);
+  color: var(--text);
+  background: var(--accent-dim);
 }
 html[data-theme="dark"] .nav-mega__btn[aria-expanded="true"] {
-  color: #2563eb;
-  background: rgba(37, 99, 235, 0.12);
+  color: var(--accent-hot, #6b8cff);
+  background: var(--accent-dim);
 }
 
 /* Chevron */
@@ -105,7 +105,7 @@ html[data-theme="dark"] .nav-mega__btn[aria-expanded="true"] {
 }
 
 html[data-theme="dark"] .nav-mega__panel {
-  background: #1e293b;
+  background: var(--bg-elevated, #141c36);
   border-color: rgba(255, 255, 255, 0.14);
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
 }
@@ -135,7 +135,7 @@ html[data-theme="dark"] .nav-mega__panel {
   padding: 0.5rem 0.6rem;
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--text, #0f172a);
+  color: var(--text, #050f40);
   text-decoration: none;
   border-radius: var(--radius-sm, 10px);
   transition: background 0.12s ease;
@@ -145,7 +145,7 @@ html[data-theme="dark"] .nav .nav-mega__panel .nav-mega__stack a {
 }
 .nav-mega__stack a:hover,
 .nav-mega__stack a:focus-visible {
-  background: var(--bg-deep, #f1f5f9);
+  background: var(--bg-deep, #eef1f8);
   outline: none;
 }
 html[data-theme="dark"] .nav-mega__stack a:hover,
@@ -181,18 +181,18 @@ html[data-theme="dark"] .nav-mega__stack a:focus-visible {
 }
 .nav-mega__login:hover,
 .nav-mega__login:focus-visible {
-  color: var(--text, #0f172a);
-  background: var(--accent-dim, rgba(37, 99, 235, 0.08));
+  color: var(--text, #050f40);
+  background: var(--accent-dim, rgba(0, 71, 225, 0.08));
   outline: none;
 }
 
 html[data-theme="dark"] .nav-mega__login {
-  color: #475569;
+  color: var(--text-muted, #94a3b8);
 }
 html[data-theme="dark"] .nav-mega__login:hover,
 html[data-theme="dark"] .nav-mega__login:focus-visible {
-  color: #0f172a;
-  background: rgba(37, 99, 235, 0.12);
+  color: var(--text);
+  background: var(--accent-dim);
 }
 
 /* --- Desktop: flyout under button --- */
@@ -263,7 +263,7 @@ html[data-theme="dark"] .nav-mega__login:focus-visible {
     margin: 0 0 0.5rem;
     border: 0;
     box-shadow: none;
-    background: var(--bg-deep, #f1f5f9);
+    background: var(--bg-deep, #eef1f8);
     border-radius: var(--radius-sm, 10px);
     padding: 0.35rem 0.5rem 0.65rem 1.25rem;
   }
@@ -304,5 +304,5 @@ html[data-theme="dark"] .nav-mega__login:focus-visible {
 .nav-mega__btn:focus-visible,
 .nav-mega__stack a:focus-visible,
 .nav-mega__login:focus-visible {
-  box-shadow: 0 0 0 2px var(--bg-base, #f8fafc), 0 0 0 4px var(--accent, #2563eb);
+  box-shadow: 0 0 0 2px var(--bg-base, #f7f8fc), 0 0 0 4px var(--accent, #0047e1);
 }

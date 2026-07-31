@@ -60,7 +60,7 @@ HEAD_TOP = """<!DOCTYPE html>
   </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#2563eb">
+  <meta name="theme-color" content="#0047e1">
   <meta name="description" content="{meta_desc}">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="{canonical}">
@@ -69,8 +69,8 @@ HEAD_TOP = """<!DOCTYPE html>
   <meta property="og:title" content="{og_title}">
   <meta property="og:url" content="{canonical}">
   <meta property="og:image" content="https://profitru.com/logos/profitru/profitru-logo-horizontal.png">
-  <meta property="og:image:width" content="900">
-  <meta property="og:image:height" content="400">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="317">
   <meta property="og:image:alt" content="Profitru logo">
   <meta property="og:description" content="{og_desc}">
   <meta property="og:site_name" content="Profitru">
@@ -88,19 +88,19 @@ HEAD_TOP = """<!DOCTYPE html>
       document.documentElement.setAttribute("data-theme", theme);
       document.documentElement.style.colorScheme = theme === "dark" ? "dark" : "light";
       var meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) meta.setAttribute("content", theme === "dark" ? "#0f172a" : "#2563eb");
+      if (meta) meta.setAttribute("content", theme === "dark" ? "#0a1024" : "#0047e1");
     }})();
   </script>
   <title>{doc_title}</title>
-  <link rel="icon" type="image/png" href="../../logos/profitru/profitru-favicon.png?v=profitru-direct-2026-04" sizes="any">
+  <link rel="icon" type="image/png" href="../../logos/profitru/profitru-favicon.png?v=profitru-final-2026-07-31" sizes="any">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Syne:wght@600;700;800&display=swap">
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet"></noscript>
-  <link rel="stylesheet" href="../../styles.css?v=profitru-2026-04-13-lineaccent">
-  <link rel="stylesheet" href="../../policies.css?v=profitru-2026-04-13">
-  <link rel="stylesheet" href="../../nav-dropdown.css?v=2026-04-25">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet"></noscript>
+  <link rel="stylesheet" href="../../styles.css?v=profitru-2026-07-31-palette">
+  <link rel="stylesheet" href="../../policies.css?v=2026-07-31-palette">
+  <link rel="stylesheet" href="../../nav-dropdown.css?v=2026-07-31-palette">
 </head>
 <body>
   <a href="#main" class="skip-link">Skip to content</a>
@@ -115,7 +115,7 @@ HEAD_TOP = """<!DOCTYPE html>
   <header class="nav" data-nav>
     <div class="nav-inner container--wide">
       <a href="/index.html" class="logo logo--tile" aria-label="Profitru home">
-        <img src="../../logos/profitru/profitru-logo-horizontal.png?v=profitru-direct-2026-04" width="900" height="400" alt="Profitru logo &mdash; Turn data into profit." class="logo-img" fetchpriority="high" decoding="async">
+        <img src="../../logos/profitru/profitru-logo-horizontal.png?v=profitru-final-2026-07-31" width="840" height="222" alt="Profitru logo &mdash; Turn data into profit." class="logo-img" fetchpriority="high" decoding="async">
       </a>
       <div class="nav-end">
         <nav class="nav-links nav-links--slim" id="nav-menu" aria-label="Primary">
@@ -194,7 +194,7 @@ HEAD_TOP = """<!DOCTYPE html>
       <div class="footer-grid">
         <div class="footer-brand">
           <a href="/index.html" class="logo logo--tile" aria-label="Profitru home">
-            <img src="../../logos/profitru/profitru-logo-horizontal.png?v=profitru-direct-2026-04" width="900" height="400" alt="Profitru logo &mdash; Turn data into profit." class="logo-img" decoding="async">
+            <img src="../../logos/profitru/profitru-logo-horizontal.png?v=profitru-final-2026-07-31" width="840" height="222" alt="Profitru logo &mdash; Turn data into profit." class="logo-img" decoding="async">
           </a>
           <p>Operational clarity for Indian sellers who list on marketplaces, run their own store, or both.</p>
         </div>
@@ -237,7 +237,7 @@ HEAD_TOP = """<!DOCTYPE html>
       </div>
     </div>
   </footer>
-  <script src="../../main.js?v=profitru-2026-04-13" defer></script>
+  <script src="../../main.js?v=2026-07-31-palette" defer></script>
   <script src="../../nav-dropdown.js?v=2026-04-25" defer></script>
 </body>
 </html>
