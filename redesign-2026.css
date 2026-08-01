@@ -189,12 +189,14 @@ html[data-theme="dark"] .brand-heading-logo {
 
 .hero-shot {
   position: relative;
-  margin-top: 0.5rem;
+  width: min(100%, 880px);
+  margin: 0.5rem auto 0;
   border-radius: 0;
   overflow: hidden;
 }
 
 .hero-shot__frame {
+  aspect-ratio: 16 / 10;
   border-radius: 14px;
   overflow: hidden;
   border: 1px solid var(--stroke, #e2e8f0);
@@ -223,7 +225,9 @@ html[data-theme="dark"] .brand-heading-logo {
 .hero-shot__frame img {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
   vertical-align: middle;
 }
 
