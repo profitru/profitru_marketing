@@ -1056,3 +1056,32 @@ body.redesign-clean .kinetic-band {
   gap: 0.65rem;
   align-items: center;
 }
+
+/* Footer always white (matches header/nav in both themes) */
+.footer {
+  background: #fff;
+  border-top: 1px solid #e2e8f0;
+  color: #475569;
+}
+
+html[data-theme="dark"] .footer .logo {
+  color: #050f40;
+}
+
+html[data-theme="dark"] .footer-brand p,
+html[data-theme="dark"] .footer-col h3,
+html[data-theme="dark"] .footer-bottom {
+  color: #64748b;
+}
+
+html[data-theme="dark"] .footer-col a {
+  color: #475569;
+}
+
+html[data-theme="dark"] .footer-col a:hover {
+  color: #0047e1;
+}
+
+html[data-theme="dark"] .footer-bottom {
+  border-top-color: #e2e8f0;
+}
